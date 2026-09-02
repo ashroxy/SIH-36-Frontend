@@ -27,10 +27,10 @@ export default function Dashboard() {
           <h2 className="font-headline-lg text-headline-lg text-on-surface">Dashboard</h2>
           <p className="font-body-md text-body-md text-on-surface-variant mt-1">Overview of your business verification activities.</p>
         </div>
-        <button className="neu-btn bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label-lg text-label-lg flex items-center gap-2 hover:bg-primary/90">
+        <Link to="/applications" className="neu-btn !bg-primary !text-on-primary px-6 py-2.5 rounded-lg font-label-lg text-label-lg flex items-center gap-2 hover:opacity-90">
           <span className="material-symbols-outlined">add_circle</span>
           New Application
-        </button>
+        </Link>
       </div>
 
       {/* Metrics Grid */}
