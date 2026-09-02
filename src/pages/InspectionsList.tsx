@@ -1,0 +1,78 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { fetchInspections } from '../api';
+
+export default function InspectionsList() {
+  const [inspections, setInspections] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchInspections().then(data => {
+      setInspections(data);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return <div className="p-8 flex items-center justify-center">Loading inspections...</div>;
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-2">
+        <div>
+          <h2 className="font-headline-lg text-headline-lg text-primary">Field Inspections</h2>
+          <p className="font-body-md text-body-md text-on-surface-variant mt-1">Manage scheduled and completed physical inspections.</p>
+        </div>
+      </div>
+
+      <div className="neu-flat overflow-hidden flex-1 flex flex-col rounded-2xl">
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-surface-dim/50">
+                <th className="py-4 px-6 font-label-lg text-label-lg text-on-surface-variant font-semibold">Inspection ID</th>
+                <th className="py-4 px-6 font-label-lg text-label-lg text-on-surface-variant font-semibold">Date</th>
+                <th className="py-4 px-6 font-label-lg text-label-lg text-on-surface-variant font-semibold">Location</th>
+                <th className="py-4 px-6 font-label-lg text-label-lg text-on-surface-variant font-semibold">Inspector</th>
+                <th className="py-4 px-6 font-label-lg text-label-lg text-on-surface-variant font-semibold">Status</th>
+                <th className="py-4 px-6 font-label-lg text-label-lg text-on-surface-variant font-semibold text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-surface-dim/30">
+              {inspections.map((insp) => (
+                <tr key={insp.id} className="hover:bg-surface-container-low/50 transition-colors group">
+                  <td className="py-4 px-6 font-code text-code text-on-surface font-medium">{insp.id}</td>
+                  <td className="py-4 px-6 font-body-md text-body-md text-on-surface">{insp.date}</td>
+                  <td className="py-4 px-6 font-body-md text-body-md text-on-surface">{insp.location}</td>
+                  <td className="py-4 px-6 font-body-md text-body-md text-on-surface">{insp.inspector}</td>
+                  <td className="py-4 px-6">
+                    <StatusBadge status={insp.status} />
+                  </td>
+                  <td className="py-4 px-6 text-right">
+                    <Link to={`/inspections/${insp.id}`} className="neu-btn px-4 py-2 text-primary font-label-sm font-bold rounded-lg hover:bg-primary/5 transition-colors">
+                      {insp.status === 'PENDING' ? 'Start' : 'View'}
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  switch (status) {
+    case 'PENDING':
+      return <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-tertiary-container/20 text-tertiary">PENDING</span>;
+    case 'COMPLETED':
+      return <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">COMPLETED</span>;
+    case 'FAILED':
+      return <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-error-container/50 text-on-error-container">FAILED</span>;
+    default:
+      return <span>{status}</span>;
+  }
+}

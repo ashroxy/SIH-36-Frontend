@@ -116,4 +116,80 @@ export const fetchCertificateDetails = async (id: string) => {
   }
 }
 
+export const fetchInspections = async () => {
+  try {
+    const response = await api.get('/inspections');
+    return response.data;
+  } catch (error) {
+    console.warn("Failed to fetch inspections, using mock data", error);
+    return [
+      { id: 'INSP-2023-110', date: '2023-10-25', inspector: 'J. Doe', status: 'PENDING', location: '124 Valley Road' },
+      { id: 'INSP-2023-109', date: '2023-10-24', inspector: 'S. Smith', status: 'COMPLETED', location: '45 Industrial Ave' },
+      { id: 'INSP-2023-108', date: '2023-10-22', inspector: 'J. Doe', status: 'FAILED', location: 'Market Square' }
+    ];
+  }
+}
+
+export const fetchCertificates = async () => {
+  try {
+    const response = await api.get('/certificates');
+    return response.data;
+  } catch (error) {
+    console.warn("Failed to fetch certificates, using mock data", error);
+    return [
+      { id: 'CERT-2023-994A', instrument: 'Industrial Flow Meter Type-X', issue_date: '2023-10-24', expiry: '2024-10-24', status: 'ACTIVE' },
+      { id: 'CERT-2023-992B', instrument: 'Bridge Scale 60t', issue_date: '2023-09-15', expiry: '2024-09-15', status: 'ACTIVE' },
+      { id: 'CERT-2022-110C', instrument: 'Checkout Scale', issue_date: '2022-10-01', expiry: '2023-10-01', status: 'EXPIRED' }
+    ];
+  }
+}
+
+export const fetchAuditLogs = async () => {
+  try {
+    const response = await api.get('/audit-logs');
+    return response.data;
+  } catch (error) {
+    console.warn("Failed to fetch audit logs, using mock data", error);
+    return [
+      { id: 'LOG-001', timestamp: '2023-10-26T10:23:45Z', action: 'LOGIN', user: 'admin@metrology.gov', details: 'Successful login from IP 192.168.1.1' },
+      { id: 'LOG-002', timestamp: '2023-10-26T11:05:12Z', action: 'CERT_ISSUED', user: 'j.doe', details: 'Issued certificate CERT-2023-994A' },
+      { id: 'LOG-003', timestamp: '2023-10-26T14:30:00Z', action: 'INSPECTION_FAILED', user: 's.smith', details: 'Failed inspection INSP-2023-108 due to eccentricity error' }
+    ];
+  }
+}
+
+export const fetchBusinessProfile = async () => {
+  try {
+    const response = await api.get('/business/profile');
+    return response.data;
+  } catch (error) {
+    console.warn("Failed to fetch business profile, using mock data", error);
+    return {
+      business_name: 'Acme Manufacturing Corp.',
+      registration_no: 'BRN-19283-XYZ',
+      tax_id: 'TAX-998822',
+      address: '45 Industrial Ave, Sector 4, Tech Park',
+      phone: '+1 (555) 123-4567',
+      email: 'contact@acmecorp.com',
+      owner: 'Michael Scott',
+      status: 'VERIFIED'
+    };
+  }
+}
+
+export const fetchSettings = async () => {
+  try {
+    const response = await api.get('/settings');
+    return response.data;
+  } catch (error) {
+    console.warn("Failed to fetch settings, using mock data", error);
+    return {
+      notifications: { email: true, sms: false, push: true },
+      theme: 'system',
+      language: 'en',
+      two_factor_auth: false
+    };
+  }
+}
+
 export default api;

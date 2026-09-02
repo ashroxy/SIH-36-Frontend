@@ -9,7 +9,12 @@ const Applications = lazy(() => import('./pages/Applications'));
 const ApplicationDetails = lazy(() => import('./pages/ApplicationDetails'));
 const FieldInspection = lazy(() => import('./pages/FieldInspection'));
 const CertificateView = lazy(() => import('./pages/CertificateView'));
-const PlaceholderPage = lazy(() => import('./pages/PlaceholderPage'));
+const Settings = lazy(() => import('./pages/Settings'));
+const Business = lazy(() => import('./pages/Business'));
+const InspectionsList = lazy(() => import('./pages/InspectionsList'));
+const CertificatesList = lazy(() => import('./pages/CertificatesList'));
+const AuditLogs = lazy(() => import('./pages/AuditLogs'));
+const Help = lazy(() => import('./pages/Help'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -34,7 +39,7 @@ function App() {
           } />
           <Route path="business" element={
             <Suspense fallback={<PageLoader />}>
-              <PlaceholderPage title="My Business" description="Manage your business profile, branches, and authorized representatives here. This module is currently under construction." />
+              <Business />
             </Suspense>
           } />
           <Route path="instruments" element={
@@ -54,7 +59,7 @@ function App() {
           } />
           <Route path="inspections" element={
             <Suspense fallback={<PageLoader />}>
-              <PlaceholderPage title="Inspections" description="View and manage pending and completed field inspections." />
+              <InspectionsList />
             </Suspense>
           } />
           <Route path="inspections/:id" element={
@@ -64,7 +69,7 @@ function App() {
           } />
           <Route path="certificates" element={
             <Suspense fallback={<PageLoader />}>
-              <PlaceholderPage title="Certificates" description="Browse all issued verification certificates." />
+              <CertificatesList />
             </Suspense>
           } />
           <Route path="certificates/:id" element={
@@ -74,17 +79,17 @@ function App() {
           } />
           <Route path="logs" element={
             <Suspense fallback={<PageLoader />}>
-              <PlaceholderPage title="Audit Logs" description="Review detailed system activity and audit logs." />
+              <AuditLogs />
             </Suspense>
           } />
           <Route path="settings" element={
             <Suspense fallback={<PageLoader />}>
-              <PlaceholderPage title="Settings" description="Configure your system preferences." />
+              <Settings />
             </Suspense>
           } />
           <Route path="help" element={
             <Suspense fallback={<PageLoader />}>
-              <PlaceholderPage title="Help & Support" description="Access user manuals and contact support." />
+              <Help />
             </Suspense>
           } />
           {/* Fallbacks */}
