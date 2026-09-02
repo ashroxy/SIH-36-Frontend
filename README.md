@@ -2,12 +2,13 @@
 
 Welcome to the frontend application for the SIH Online Verification System! This modern, responsive, and robust React application is designed to interface seamlessly with the FastAPI backend, providing an intuitive experience for Business Users, Legal Metrology Officers (LMOs), and System Administrators.
 
-## 🚀 Features
+## 🚀 Features & Optimizations
 
 - **Dynamic Dashboards**: Real-time business metrics, recent applications, and workflow statuses.
 - **Instrument Inventory Management**: Track and manage all measuring instruments, filtering by status, category, and calibration dates.
 - **Field Inspection Module**: Dedicated views for LMOs to input precision readings (load tests, eccentricity) and upload evidence on the go.
 - **Digital Certificates**: Instantly generated, scannable digital verification certificates.
+- **Production Ready Performance**: Engineered for speed. Implements **Route-level Code Splitting** (via `React.lazy` and `<Suspense>`) to ensure blazing-fast initial load times. Critical fonts are pre-loaded at the network level.
 - **Graceful API Fallbacks**: The frontend is engineered with resilience in mind. If the backend is unreachable (e.g., during local UI development or backend downtime), the app seamlessly falls back to high-quality mock data, ensuring a perfectly unbroken UI preview.
 - **Modern Tech Stack**: Powered by **Vite**, **React 18**, **TypeScript**, and **Tailwind CSS v4** (with custom Neumorphic theming).
 
@@ -17,7 +18,7 @@ Welcome to the frontend application for the SIH Online Verification System! This
 LM-Verify-Frontend/
 ├── src/
 │   ├── api.ts                     # API client configuring Axios and graceful mock fallbacks
-│   ├── App.tsx                    # Main React Router setup
+│   ├── App.tsx                    # Main React Router setup (with Suspense lazy loading)
 │   ├── main.tsx                   # React Entry Point
 │   ├── index.css                  # Tailwind CSS v4 entry and global styles
 │   ├── components/
@@ -74,7 +75,7 @@ To create a production-ready optimized build:
 ```bash
 npm run build
 ```
-This command runs `tsc` (TypeScript type checking) and `vite build`. The output will be generated in the `/dist` directory.
+This command runs `tsc` (TypeScript type checking) and `vite build`. The output will be chunked into separate JavaScript modules for optimized delivery.
 
 ---
 *Built with ❤️ for the SIH Verification System*
