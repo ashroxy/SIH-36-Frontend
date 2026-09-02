@@ -91,7 +91,7 @@ export default function Dashboard() {
       <div className="neu-flat p-padding-card mt-8">
         <div className="flex justify-between items-center mb-6">
           <h3 className="font-headline-sm text-headline-sm text-on-surface">Recent Applications</h3>
-          <button className="text-primary font-label-lg text-label-lg hover:underline decoration-primary underline-offset-4">View All</button>
+          <Link to="/applications" className="text-primary font-label-lg text-label-lg hover:underline decoration-primary underline-offset-4">View All</Link>
         </div>
         <div className="overflow-x-auto pb-4">
           <table className="w-full text-left border-collapse min-w-[600px]">

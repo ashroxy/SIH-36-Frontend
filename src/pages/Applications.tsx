@@ -4,22 +4,55 @@ import { Link } from 'react-router-dom';
 
 export default function Applications() {
     const [applications, setApplications] = useState<any[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     useEffect(() => {
         fetchApplications().then(setApplications).catch(console.error);
     }, []);
 
+    const filteredApplications = applications.filter(app => 
+      app.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      (app.type && app.type.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      app.status.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
-        <div className="max-w-7xl mx-auto space-y-8 w-full">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+        <div className="max-w-7xl mx-auto space-y-8 w-full relative">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                 <div>
-                    <h2 className="font-headline-lg text-headline-lg text-on-surface">Applications</h2>
+                    <h2 className="font-headline-lg text-headline-lg text-primary">Applications</h2>
                     <p className="font-body-md text-body-md text-on-surface-variant mt-1">Manage all verification applications.</p>
                 </div>
-                <button className="neu-btn bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label-lg text-label-lg flex items-center gap-2">
+                <button 
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="neu-btn !bg-primary !text-on-primary px-6 py-2.5 rounded-lg font-label-lg text-label-lg flex items-center gap-2 hover:opacity-90"
+                >
                     <span className="material-symbols-outlined">add_circle</span>
                     New Application
                 </button>
+            </div>
+
+            {/* Filters */}
+            <div className="neu-recessed p-4 flex flex-col lg:flex-row gap-4 items-center justify-between w-full mb-4">
+              <div className="relative w-full lg:w-96 flex-shrink-0">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                <input 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="neu-input w-full pl-12 pr-4 py-3 text-body-md font-body-md placeholder-on-surface-variant/70 text-on-surface bg-transparent focus:ring-0 outline-none" 
+                  placeholder="Search by App ID or Status..." 
+                  type="text" 
+                />
+              </div>
+              <div className="flex flex-wrap gap-3 w-full lg:w-auto items-center">
+                <button className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
+                  <span className="material-symbols-outlined text-[18px]">filter_list</span> Type
+                </button>
+                <button className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
+                  <span className="material-symbols-outlined text-[18px]">check_circle</span> Status
+                </button>
+              </div>
             </div>
 
             <div className="neu-flat p-padding-card">
@@ -34,26 +67,72 @@ export default function Applications() {
                             </tr>
                         </thead>
                         <tbody className="text-body-md text-on-surface">
-                            {applications.map((app) => (
-                                <tr key={app.id} className="border-b border-surface-container-highest/50 hover:bg-surface-container-low/50 transition-colors">
-                                    <td className="py-4 px-4 font-code text-primary">{app.id}</td>
-                                    <td className="py-4 px-4">{app.type || 'New Verification'}</td>
-                                    <td className="py-4 px-4">
-                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-surface-variant/10 text-on-surface-variant border border-surface-variant/20">
-                                            {app.status}
-                                        </span>
-                                    </td>
-                                    <td className="py-4 px-4 text-right">
-                                        <Link to={`/applications/${app.id}`} className="neu-btn p-2 text-on-surface-variant rounded-md inline-flex items-center justify-center">
-                                            <span className="material-symbols-outlined text-[18px]">visibility</span>
-                                        </Link>
-                                    </td>
+                            {filteredApplications.length > 0 ? (
+                                filteredApplications.map((app) => (
+                                    <tr key={app.id} className="border-b border-surface-container-highest/50 hover:bg-surface-container-low/50 transition-colors">
+                                        <td className="py-4 px-4 font-code text-primary">{app.id}</td>
+                                        <td className="py-4 px-4">{app.type || 'New Verification'}</td>
+                                        <td className="py-4 px-4">
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-surface-variant/10 text-on-surface-variant border border-surface-variant/20">
+                                                {app.status}
+                                            </span>
+                                        </td>
+                                        <td className="py-4 px-4 text-right">
+                                            <Link to={`/applications/${app.id}`} className="neu-btn p-2 text-on-surface-variant rounded-md inline-flex items-center justify-center">
+                                                <span className="material-symbols-outlined text-[18px]">visibility</span>
+                                            </Link>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                  <td colSpan={4} className="py-8 text-center text-on-surface-variant font-body-md">No applications match your search.</td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            {/* Add Application Modal */}
+            {isAddModalOpen && (
+              <div className="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+                <div className="neu-flat rounded-2xl w-full max-w-lg p-6 bg-background max-h-[90vh] overflow-y-auto">
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="font-headline-sm text-headline-sm text-on-surface">Start New Application</h2>
+                    <button onClick={() => setIsAddModalOpen(false)} className="w-8 h-8 flex items-center justify-center text-on-surface-variant neu-btn rounded-full">
+                      <span className="material-symbols-outlined">close</span>
+                    </button>
+                  </div>
+                  
+                  <div className="flex flex-col gap-4">
+                    <div>
+                      <label className="block text-label-sm font-label-sm text-on-surface-variant mb-1">Application Type</label>
+                      <select className="w-full neu-input-container rounded-lg px-4 py-2 text-body-md outline-none focus:ring-2 focus:ring-primary/20 bg-transparent">
+                        <option>New Verification</option>
+                        <option>Renewal</option>
+                        <option>Re-verification (Post Repair)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-label-sm font-label-sm text-on-surface-variant mb-1">Select Instrument</label>
+                      <select className="w-full neu-input-container rounded-lg px-4 py-2 text-body-md outline-none focus:ring-2 focus:ring-primary/20 bg-transparent">
+                        <option>SN-998822 (Weighing Scale)</option>
+                        <option>SN-112233 (Flow Meter)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-label-sm font-label-sm text-on-surface-variant mb-1">Preferred Date</label>
+                      <input type="date" className="w-full neu-input-container rounded-lg px-4 py-2 text-body-md outline-none focus:ring-2 focus:ring-primary/20 bg-transparent" />
+                    </div>
+                    <div className="mt-4 flex justify-end gap-3">
+                      <button onClick={() => setIsAddModalOpen(false)} className="px-6 py-2 neu-btn text-on-surface-variant font-label-lg rounded-lg">Cancel</button>
+                      <button onClick={() => setIsAddModalOpen(false)} className="px-6 py-2 neu-btn text-on-primary bg-primary font-label-lg font-bold rounded-lg hover:opacity-90">Create Draft</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
         </div>
     );
 }

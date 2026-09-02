@@ -4,6 +4,8 @@ import { fetchInstruments } from '../api';
 export default function Instruments() {
   const [instruments, setInstruments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
     fetchInstruments().then(data => {
@@ -12,19 +14,27 @@ export default function Instruments() {
     });
   }, []);
 
+  const filteredInstruments = instruments.filter(inst => 
+    inst.serial_number.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    inst.instrument_type.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (loading) {
     return <div className="p-8 flex items-center justify-center">Loading instruments...</div>;
   }
 
   return (
-    <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col gap-stack-gap">
+    <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col gap-stack-gap relative">
       {/* Page Header & Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <div>
           <h2 className="font-headline-lg text-headline-lg text-primary">Instrument Inventory</h2>
           <p className="font-body-md text-body-md text-on-surface-variant mt-1">Manage and track your registered measuring instruments.</p>
         </div>
-        <button className="neu-btn px-6 py-3 flex items-center gap-2 text-primary font-label-lg font-bold bg-primary-fixed/20 hover:bg-primary-fixed/30">
+        <button 
+          onClick={() => setIsAddModalOpen(true)}
+          className="neu-btn px-6 py-3 flex items-center gap-2 text-primary font-label-lg font-bold bg-primary-fixed/20 hover:bg-primary-fixed/30"
+        >
           <span className="material-symbols-outlined">add_circle</span>
           Add New Instrument
         </button>
@@ -34,7 +44,13 @@ export default function Instruments() {
       <div className="neu-recessed p-4 flex flex-col lg:flex-row gap-4 items-center justify-between w-full">
         <div className="relative w-full lg:w-96 flex-shrink-0">
           <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-          <input className="neu-input w-full pl-12 pr-4 py-3 text-body-md font-body-md placeholder-on-surface-variant/70 text-on-surface bg-transparent focus:ring-0 outline-none" placeholder="Search by Serial Number or Type..." type="text" />
+          <input 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="neu-input w-full pl-12 pr-4 py-3 text-body-md font-body-md placeholder-on-surface-variant/70 text-on-surface bg-transparent focus:ring-0 outline-none" 
+            placeholder="Search by Serial Number or Type..." 
+            type="text" 
+          />
         </div>
         <div className="flex flex-wrap gap-3 w-full lg:w-auto items-center">
           <button className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
@@ -64,32 +80,38 @@ export default function Instruments() {
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-dim/30">
-              {instruments.map((instrument) => (
-                <tr key={instrument.id} className="hover:bg-surface-container-low/50 transition-colors group">
-                  <td className="py-4 px-6 font-code text-code text-on-surface font-medium">{instrument.serial_number}</td>
-                  <td className="py-4 px-6">
-                    <div className="font-body-md text-body-md text-on-surface font-medium">{instrument.instrument_type}</div>
-                    <div className="font-label-sm text-label-sm text-on-surface-variant">{instrument.model_number}</div>
-                  </td>
-                  <td className="py-4 px-6 font-body-md text-body-md text-on-surface-variant">{instrument.capacity_max}{instrument.unit_of_measurement} / Class III</td>
-                  <td className="py-4 px-6 font-body-md text-body-md text-on-surface-variant">{instrument.verification_frequency_months} mos</td>
-                  <td className="py-4 px-6">
-                    <InstrumentStatus status={instrument.status} />
-                  </td>
-                  <td className="py-4 px-6 text-right">
-                    <button className="w-8 h-8 rounded-full neu-btn flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors ml-auto opacity-0 group-hover:opacity-100 focus:opacity-100">
-                      <span className="material-symbols-outlined text-[18px]">more_vert</span>
-                    </button>
-                  </td>
+              {filteredInstruments.length > 0 ? (
+                filteredInstruments.map((instrument) => (
+                  <tr key={instrument.id} className="hover:bg-surface-container-low/50 transition-colors group">
+                    <td className="py-4 px-6 font-code text-code text-on-surface font-medium">{instrument.serial_number}</td>
+                    <td className="py-4 px-6">
+                      <div className="font-body-md text-body-md text-on-surface font-medium">{instrument.instrument_type}</div>
+                      <div className="font-label-sm text-label-sm text-on-surface-variant">{instrument.model_number}</div>
+                    </td>
+                    <td className="py-4 px-6 font-body-md text-body-md text-on-surface-variant">{instrument.capacity_max}{instrument.unit_of_measurement} / Class III</td>
+                    <td className="py-4 px-6 font-body-md text-body-md text-on-surface-variant">{instrument.verification_frequency_months} mos</td>
+                    <td className="py-4 px-6">
+                      <InstrumentStatus status={instrument.status} />
+                    </td>
+                    <td className="py-4 px-6 text-right">
+                      <button className="w-8 h-8 rounded-full neu-btn flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors ml-auto opacity-0 group-hover:opacity-100 focus:opacity-100">
+                        <span className="material-symbols-outlined text-[18px]">more_vert</span>
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-on-surface-variant font-body-md">No instruments match your search.</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
         
         {/* Pagination */}
         <div className="p-4 border-t border-surface-dim/30 flex items-center justify-between">
-          <span className="font-body-md text-body-md text-on-surface-variant">Showing 1-{instruments.length} of {instruments.length} instruments</span>
+          <span className="font-body-md text-body-md text-on-surface-variant">Showing 1-{filteredInstruments.length} of {instruments.length} instruments</span>
           <div className="flex gap-2">
             <button className="w-8 h-8 neu-btn flex items-center justify-center text-on-surface-variant hover:text-primary disabled:opacity-50" disabled>
               <span className="material-symbols-outlined text-[18px]">chevron_left</span>
@@ -103,6 +125,53 @@ export default function Instruments() {
           </div>
         </div>
       </div>
+
+      {/* Add New Instrument Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="neu-flat rounded-2xl w-full max-w-lg p-6 bg-background max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-headline-sm text-headline-sm text-on-surface">Add New Instrument</h2>
+              <button onClick={() => setIsAddModalOpen(false)} className="w-8 h-8 flex items-center justify-center text-on-surface-variant neu-btn rounded-full">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            
+            <div className="flex flex-col gap-4">
+              <div>
+                <label className="block text-label-sm font-label-sm text-on-surface-variant mb-1">Serial Number</label>
+                <input type="text" className="w-full neu-input-container rounded-lg px-4 py-2 text-body-md outline-none focus:ring-2 focus:ring-primary/20" placeholder="e.g. SN-998822" />
+              </div>
+              <div>
+                <label className="block text-label-sm font-label-sm text-on-surface-variant mb-1">Instrument Type</label>
+                <select className="w-full neu-input-container rounded-lg px-4 py-2 text-body-md outline-none focus:ring-2 focus:ring-primary/20 bg-transparent">
+                  <option>Weighing Scale</option>
+                  <option>Flow Meter</option>
+                  <option>Thermometer</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-label-sm font-label-sm text-on-surface-variant mb-1">Max Capacity</label>
+                  <input type="number" className="w-full neu-input-container rounded-lg px-4 py-2 text-body-md outline-none" placeholder="0" />
+                </div>
+                <div>
+                  <label className="block text-label-sm font-label-sm text-on-surface-variant mb-1">Unit</label>
+                  <select className="w-full neu-input-container rounded-lg px-4 py-2 text-body-md outline-none bg-transparent">
+                    <option>kg</option>
+                    <option>liters</option>
+                    <option>meters</option>
+                  </select>
+                </div>
+              </div>
+              <div className="mt-4 flex justify-end gap-3">
+                <button onClick={() => setIsAddModalOpen(false)} className="px-6 py-2 neu-btn text-on-surface-variant font-label-lg rounded-lg">Cancel</button>
+                <button onClick={() => setIsAddModalOpen(false)} className="px-6 py-2 neu-btn text-primary bg-primary/10 font-label-lg font-bold rounded-lg">Add Instrument</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
