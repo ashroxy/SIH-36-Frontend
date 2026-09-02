@@ -1,32 +1,80 @@
-# React + TypeScript + Vite
+# SIH Online Verification System - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Welcome to the frontend application for the SIH Online Verification System! This modern, responsive, and robust React application is designed to interface seamlessly with the FastAPI backend, providing an intuitive experience for Business Users, Legal Metrology Officers (LMOs), and System Administrators.
 
-Currently, two official plugins are available:
+## 🚀 Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Dynamic Dashboards**: Real-time business metrics, recent applications, and workflow statuses.
+- **Instrument Inventory Management**: Track and manage all measuring instruments, filtering by status, category, and calibration dates.
+- **Field Inspection Module**: Dedicated views for LMOs to input precision readings (load tests, eccentricity) and upload evidence on the go.
+- **Digital Certificates**: Instantly generated, scannable digital verification certificates.
+- **Graceful API Fallbacks**: The frontend is engineered with resilience in mind. If the backend is unreachable (e.g., during local UI development or backend downtime), the app seamlessly falls back to high-quality mock data, ensuring a perfectly unbroken UI preview.
+- **Modern Tech Stack**: Powered by **Vite**, **React 18**, **TypeScript**, and **Tailwind CSS v4** (with custom Neumorphic theming).
 
-## React Compiler
+## 📂 Project Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```text
+LM-Verify-Frontend/
+├── src/
+│   ├── api.ts                     # API client configuring Axios and graceful mock fallbacks
+│   ├── App.tsx                    # Main React Router setup
+│   ├── main.tsx                   # React Entry Point
+│   ├── index.css                  # Tailwind CSS v4 entry and global styles
+│   ├── components/
+│   │   └── Layout.tsx             # Global layout, Sidebar navigation, and TopNav
+│   └── pages/
+│       ├── Dashboard.tsx          # Business overview and metrics
+│       ├── Instruments.tsx        # Instrument tracking and lists
+│       ├── ApplicationDetails.tsx # Detailed view of an application & dynamic stepper
+│       ├── FieldInspection.tsx    # Inspection form for field officers
+│       └── CertificateView.tsx    # Digital verification certificate view
+├── public/                        # Static assets (Favicon, icons)
+├── index.html                     # HTML Template
+├── tailwind.config.js             # Tailwind design system configuration
+├── postcss.config.js              # PostCSS plugins (Tailwind v4 adapter)
+├── package.json                   # Dependencies
+└── README.md                      # You are here!
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## 🛠️ Setup & Installation
+
+Ensure you have [Node.js](https://nodejs.org/) (v18+) installed.
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/ashroxy/SIH-36-Frontend.git
+   cd SIH-36-Frontend
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
+   The application will be accessible at `http://localhost:5173`.
+
+## 🔗 Backend Integration
+
+The frontend uses `axios` to communicate with the backend. 
+- The default `baseURL` in `src/api.ts` is configured to `http://localhost:8006/api/v1` (matching the FastAPI backend configuration).
+- **Authentication**: It automatically attaches a Bearer token from `localStorage` (`access_token`) to all requests.
+- **Resilience**: If an API call fails (e.g., `ERR_CONNECTION_REFUSED`), the `try-catch` blocks in `api.ts` intercept the error, log a warning to the console, and return pre-defined mock data to keep the UI completely functional.
+
+## 🎨 Styling
+
+The application heavily utilizes **Tailwind CSS** with a custom color palette derived from Material You / Neumorphism guidelines. The configuration (`tailwind.config.js`) enforces specific border radii, typography (Plus Jakarta Sans & JetBrains Mono), and neumorphic shadow effects (`neu-flat`, `neu-recessed`, `neu-btn`).
+
+## 🧪 Building for Production
+
+To create a production-ready optimized build:
+```bash
+npm run build
+```
+This command runs `tsc` (TypeScript type checking) and `vite build`. The output will be generated in the `/dist` directory.
+
+---
+*Built with ❤️ for the SIH Verification System*
