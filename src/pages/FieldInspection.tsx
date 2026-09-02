@@ -9,6 +9,7 @@ export default function FieldInspection() {
   const [eccentricity, setEccentricity] = useState('');
   const [isWithinTolerance, setIsWithinTolerance] = useState(true);
   const [notes, setNotes] = useState('');
+  const [uploadedFiles, setUploadedFiles] = useState([{ id: 1, name: 'seal_front_01.jpg', size: '2.4 MB' }]);
   const [loading, setLoading] = useState(false);
   const [appData, setAppData] = useState<any>(null);
 
@@ -123,8 +124,7 @@ export default function FieldInspection() {
           </div>
         </div>
       </section>
-
-      {/* Media Upload */}
+      {/* Media Upload */}
       <section className="flex flex-col gap-4">
         <h3 className="font-headline-sm text-headline-sm font-semibold px-1">Evidence & Files</h3>
         <div className="neu-flat rounded-xl p-5 flex flex-col gap-4">
@@ -136,19 +136,21 @@ export default function FieldInspection() {
             <span className="font-label-sm text-label-sm text-on-surface-variant text-center">Requires geotagged images</span>
           </div>
           <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between p-3 neu-flat rounded-lg">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-md overflow-hidden neu-recessed bg-gray-200">
+            {uploadedFiles.map(file => (
+              <div key={file.id} className="flex items-center justify-between p-3 neu-flat rounded-lg">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-md overflow-hidden neu-recessed bg-gray-200">
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-label-sm text-label-sm text-on-surface font-semibold truncate w-32">{file.name}</span>
+                    <span className="font-label-sm text-label-sm text-on-surface-variant text-[10px]">{file.size} ? GPS Tagged</span>
+                  </div>
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-label-sm text-label-sm text-on-surface font-semibold truncate w-32">seal_front_01.jpg</span>
-                  <span className="font-label-sm text-label-sm text-on-surface-variant text-[10px]">2.4 MB • GPS Tagged</span>
-                </div>
+                <button onClick={() => setUploadedFiles(f => f.filter(x => x.id !== file.id))} className="text-error p-2 rounded-full hover:bg-error-container/50 transition-colors flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[18px]">delete</span>
+                </button>
               </div>
-              <button className="text-error p-2 rounded-full hover:bg-error-container/50 transition-colors flex items-center justify-center">
-                <span className="material-symbols-outlined text-[18px]">delete</span>
-              </button>
-            </div>
+            ))}
           </div>
         </div>
       </section>
@@ -170,7 +172,7 @@ export default function FieldInspection() {
       {/* Action Bar */}
       <div className="fixed bottom-0 left-0 md:left-64 right-0 bg-background/80 backdrop-blur-md p-4 shadow-[0_-4px_10px_rgba(220,225,235,0.5)] z-10 border-t border-surface-dim">
         <div className="max-w-4xl mx-auto flex gap-4">
-          <button className="flex-1 py-4 neu-btn rounded-xl font-label-lg text-label-lg text-on-surface font-bold">
+          <button onClick={() => { alert("Draft Saved Successfully!"); navigate(-1); }} className="flex-1 py-4 neu-btn rounded-xl font-label-lg text-label-lg text-on-surface font-bold">
             Save Draft
           </button>
           <button 

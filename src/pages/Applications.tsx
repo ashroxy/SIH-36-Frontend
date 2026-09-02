@@ -46,10 +46,10 @@ export default function Applications() {
                 />
               </div>
               <div className="flex flex-wrap gap-3 w-full lg:w-auto items-center">
-                <button className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
+                <button onClick={() => alert("Type filter options coming soon.")} className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
                   <span className="material-symbols-outlined text-[18px]">filter_list</span> Type
                 </button>
-                <button className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
+                <button onClick={() => alert("Status filter options coming soon.")} className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
                   <span className="material-symbols-outlined text-[18px]">check_circle</span> Status
                 </button>
               </div>
@@ -127,7 +127,7 @@ export default function Applications() {
                     </div>
                     <div className="mt-4 flex justify-end gap-3">
                       <button onClick={() => setIsAddModalOpen(false)} className="px-6 py-2 neu-btn text-on-surface-variant font-label-lg rounded-lg">Cancel</button>
-                      <button onClick={() => setIsAddModalOpen(false)} className="px-6 py-2 neu-btn text-on-primary bg-primary font-label-lg font-bold rounded-lg hover:opacity-90">Create Draft</button>
+                      <button onClick={() => setIsAddModalOpen(false)} className="px-6 py-2 neu-btn !text-on-primary !bg-primary font-label-lg font-bold rounded-lg hover:opacity-90">Create Draft</button>
                     </div>
                   </div>
                 </div>

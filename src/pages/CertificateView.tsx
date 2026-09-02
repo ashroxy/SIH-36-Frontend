@@ -36,10 +36,15 @@ export default function CertificateView() {
           <h2 className="font-headline-lg text-headline-lg text-on-surface">Digital Verification Certificate</h2>
         </div>
         <div className="flex gap-4">
-          <button className="neu-btn px-6 py-3 rounded-full flex items-center gap-2 text-primary font-label-lg text-label-lg hover:bg-primary/5 transition-colors">
+          <button onClick={() => window.print()} className="neu-btn px-6 py-3 rounded-full flex items-center gap-2 text-primary font-label-lg text-label-lg hover:bg-primary/5 transition-colors">
             <span className="material-symbols-outlined">print</span> Print
           </button>
-          <button className="neu-btn px-6 py-3 rounded-full flex items-center gap-2 bg-primary/5 text-primary font-label-lg text-label-lg hover:bg-primary/10 transition-colors">
+          <button onClick={() => {
+            const link = document.createElement("a");
+            link.href = "data:application/pdf;base64,JVBERi0xLjQKJ...";
+            link.download = `certificate_${id}.pdf`;
+            link.click();
+          }} className="neu-btn px-6 py-3 rounded-full flex items-center gap-2 bg-primary/5 text-primary font-label-lg text-label-lg hover:bg-primary/10 transition-colors">
             <span className="material-symbols-outlined">download</span> Download PDF
           </button>
         </div>

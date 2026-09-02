@@ -24,7 +24,16 @@ export default function AuditLogs() {
           <p className="font-body-md text-body-md text-on-surface-variant mt-1">Review detailed activity records and historical events.</p>
         </div>
         <div className="flex gap-2">
-          <button className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-sm">
+          <button onClick={() => {
+            const csvContent = "data:text/csv;charset=utf-8,ID,Action,User,Date\n" + logs.map(l => `${l.id},${l.action},${l.user},${l.timestamp}`).join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "audit_logs.csv");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+          }} className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-sm">
             <span className="material-symbols-outlined text-[18px]">download</span> Export CSV
           </button>
         </div>

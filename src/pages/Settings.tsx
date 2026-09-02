@@ -4,6 +4,8 @@ import { fetchSettings } from '../api';
 export default function Settings() {
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSettings().then(data => {
@@ -12,12 +14,30 @@ export default function Settings() {
     });
   }, []);
 
+  const handleSave = () => {
+    setIsSaving(true);
+    // Simulate API call
+    setTimeout(() => {
+      setIsSaving(false);
+      setToastMessage("Settings saved successfully!");
+      setTimeout(() => setToastMessage(null), 3000);
+    }, 800);
+  };
+
   if (loading) {
     return <div className="p-8 flex items-center justify-center">Loading settings...</div>;
   }
 
   return (
-    <div className="max-w-4xl mx-auto w-full flex flex-col gap-6">
+    <div className="max-w-4xl mx-auto w-full flex flex-col gap-6 relative">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-green-100 text-green-800 px-6 py-3 rounded-full shadow-lg z-50 flex items-center gap-2 font-label-lg transition-all animate-bounce">
+          <span className="material-symbols-outlined">check_circle</span>
+          {toastMessage}
+        </div>
+      )}
+
       <div className="mb-2">
         <h2 className="font-headline-lg text-headline-lg text-primary">Settings</h2>
         <p className="font-body-md text-body-md text-on-surface-variant mt-1">Manage your account and system preferences.</p>
@@ -70,7 +90,7 @@ export default function Settings() {
             </label>
           </div>
           <div className="mt-2">
-            <button className="neu-btn px-6 py-2 text-primary font-label-lg rounded-lg">Change Password</button>
+            <button onClick={() => { setToastMessage("Password change instructions sent to email."); setTimeout(() => setToastMessage(null), 3000); }} className="neu-btn px-6 py-2 text-primary font-label-lg rounded-lg">Change Password</button>
           </div>
         </div>
       </div>
@@ -102,8 +122,11 @@ export default function Settings() {
       </div>
       
       <div className="flex justify-end gap-4 mt-4">
-        <button className="neu-btn px-8 py-3 text-on-surface font-label-lg rounded-lg">Cancel</button>
-        <button className="neu-btn px-8 py-3 text-primary font-label-lg font-bold bg-primary/10 rounded-lg">Save Changes</button>
+        <button onClick={() => window.history.back()} className="neu-btn px-8 py-3 text-on-surface font-label-lg rounded-lg">Cancel</button>
+        <button onClick={handleSave} disabled={isSaving} className="neu-btn px-8 py-3 text-primary font-label-lg font-bold bg-primary/10 rounded-lg flex items-center gap-2">
+          {isSaving ? <span className="material-symbols-outlined animate-spin">sync</span> : null}
+          {isSaving ? "Saving..." : "Save Changes"}
+        </button>
       </div>
     </div>
   );

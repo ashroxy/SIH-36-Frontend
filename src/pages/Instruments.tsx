@@ -53,13 +53,13 @@ export default function Instruments() {
           />
         </div>
         <div className="flex flex-wrap gap-3 w-full lg:w-auto items-center">
-          <button className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
+          <button onClick={() => alert("Category filter options coming soon.")} className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
             <span className="material-symbols-outlined text-[18px]">filter_list</span> Category
           </button>
-          <button className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
+          <button onClick={() => alert("Calibration date filter options coming soon.")} className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
             <span className="material-symbols-outlined text-[18px]">event</span> Calibration Date
           </button>
-          <button className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
+          <button onClick={() => alert("Status filter options coming soon.")} className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
             <span className="material-symbols-outlined text-[18px]">check_circle</span> Status
           </button>
         </div>
@@ -94,7 +94,7 @@ export default function Instruments() {
                       <InstrumentStatus status={instrument.status} />
                     </td>
                     <td className="py-4 px-6 text-right">
-                      <button className="w-8 h-8 rounded-full neu-btn flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors ml-auto opacity-0 group-hover:opacity-100 focus:opacity-100">
+                      <button onClick={() => alert("Instrument actions: Edit, Delete, View History")} className="w-8 h-8 rounded-full neu-btn flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors ml-auto opacity-0 group-hover:opacity-100 focus:opacity-100">
                         <span className="material-symbols-outlined text-[18px]">more_vert</span>
                       </button>
                     </td>

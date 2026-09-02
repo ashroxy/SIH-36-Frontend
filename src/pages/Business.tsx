@@ -51,9 +51,9 @@ export default function Business() {
           <div className="neu-flat rounded-2xl p-6">
              <h4 className="font-label-lg text-label-lg text-on-surface mb-4 border-b border-surface-dim pb-2">Quick Actions</h4>
              <ul className="flex flex-col gap-2">
-               <li><button className="w-full text-left neu-btn px-4 py-2 rounded-lg text-primary flex items-center gap-2 hover:bg-primary/5"><span className="material-symbols-outlined text-sm">add_circle</span> Add Branch</button></li>
-               <li><button className="w-full text-left neu-btn px-4 py-2 rounded-lg text-primary flex items-center gap-2 hover:bg-primary/5"><span className="material-symbols-outlined text-sm">group_add</span> Add Representative</button></li>
-               <li><button className="w-full text-left neu-btn px-4 py-2 rounded-lg text-primary flex items-center gap-2 hover:bg-primary/5"><span className="material-symbols-outlined text-sm">cloud_upload</span> Upload Documents</button></li>
+               <li><button onClick={() => alert("Add Branch flow initiated.")} className="w-full text-left neu-btn px-4 py-2 rounded-lg text-primary flex items-center gap-2 hover:bg-primary/5"><span className="material-symbols-outlined text-sm">add_circle</span> Add Branch</button></li>
+               <li><button onClick={() => alert("Add Representative flow initiated.")} className="w-full text-left neu-btn px-4 py-2 rounded-lg text-primary flex items-center gap-2 hover:bg-primary/5"><span className="material-symbols-outlined text-sm">group_add</span> Add Representative</button></li>
+               <li><button onClick={() => alert("Document upload dialog triggered.")} className="w-full text-left neu-btn px-4 py-2 rounded-lg text-primary flex items-center gap-2 hover:bg-primary/5"><span className="material-symbols-outlined text-sm">cloud_upload</span> Upload Documents</button></li>
              </ul>
           </div>
         </div>

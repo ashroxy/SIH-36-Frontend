@@ -53,7 +53,12 @@ export default function CertificatesList() {
             </div>
             
             <div className="mt-4 pt-4 border-t border-surface-dim/50 flex justify-between">
-              <button className="neu-btn px-4 py-2 text-on-surface-variant font-label-sm flex items-center gap-2 rounded-lg hover:text-primary transition-colors">
+              <button onClick={() => {
+                const link = document.createElement("a");
+                link.href = "data:application/pdf;base64,JVBERi0xLjQKJ...";
+                link.download = `certificate_${cert.id}.pdf`;
+                link.click();
+              }} className="neu-btn px-4 py-2 text-on-surface-variant font-label-sm flex items-center gap-2 rounded-lg hover:text-primary transition-colors">
                 <span className="material-symbols-outlined text-[18px]">download</span> PDF
               </button>
               <Link to={`/certificates/${cert.id}`} className="neu-btn px-4 py-2 text-primary font-label-sm font-bold bg-primary/5 rounded-lg hover:bg-primary/10 transition-colors">

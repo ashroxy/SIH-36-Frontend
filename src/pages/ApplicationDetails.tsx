@@ -119,10 +119,10 @@ export default function ApplicationDetails() {
 
       {/* Action Bar */}
       <div className="fixed bottom-0 left-0 md:left-64 right-0 bg-background/80 backdrop-blur-md p-4 shadow-[0_-4px_10px_rgba(220,225,235,0.5)] flex justify-end gap-4 z-10 border-t border-surface-dim">
-        <button className="neu-btn px-6 py-2.5 font-label-lg text-label-lg text-on-surface-variant flex items-center gap-2">
+        <button onClick={() => window.print()} className="neu-btn px-6 py-2.5 font-label-lg text-label-lg text-on-surface-variant flex items-center gap-2">
           <span className="material-symbols-outlined text-sm">print</span> Print Summary
         </button>
-        <button className="neu-btn px-6 py-2.5 font-label-lg text-label-lg text-error flex items-center gap-2">
+        <button onClick={() => { if(window.confirm('Are you sure you want to cancel this application?')) { alert('Application Cancelled.'); navigate('/applications'); } }} className="neu-btn px-6 py-2.5 font-label-lg text-label-lg text-error flex items-center gap-2">
           <span className="material-symbols-outlined text-sm">cancel</span> Cancel App
         </button>
         <Link to={`/inspections/${id}`} className="neu-btn px-8 py-2.5 font-label-lg text-label-lg flex items-center gap-2 ml-4 text-primary bg-primary/5 hover:bg-primary/10 transition-colors rounded-lg">
