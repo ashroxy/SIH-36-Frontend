@@ -5,9 +5,11 @@ import Layout from './components/Layout';
 // Lazy load the pages for better performance
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Instruments = lazy(() => import('./pages/Instruments'));
+const Applications = lazy(() => import('./pages/Applications'));
 const ApplicationDetails = lazy(() => import('./pages/ApplicationDetails'));
 const FieldInspection = lazy(() => import('./pages/FieldInspection'));
 const CertificateView = lazy(() => import('./pages/CertificateView'));
+const PlaceholderPage = lazy(() => import('./pages/PlaceholderPage'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -30,9 +32,19 @@ function App() {
               <Dashboard />
             </Suspense>
           } />
+          <Route path="business" element={
+            <Suspense fallback={<PageLoader />}>
+              <PlaceholderPage title="My Business" description="Manage your business profile, branches, and authorized representatives here. This module is currently under construction." />
+            </Suspense>
+          } />
           <Route path="instruments" element={
             <Suspense fallback={<PageLoader />}>
               <Instruments />
+            </Suspense>
+          } />
+          <Route path="applications" element={
+            <Suspense fallback={<PageLoader />}>
+              <Applications />
             </Suspense>
           } />
           <Route path="applications/:id" element={
@@ -40,14 +52,39 @@ function App() {
               <ApplicationDetails />
             </Suspense>
           } />
+          <Route path="inspections" element={
+            <Suspense fallback={<PageLoader />}>
+              <PlaceholderPage title="Inspections" description="View and manage pending and completed field inspections." />
+            </Suspense>
+          } />
           <Route path="inspections/:id" element={
             <Suspense fallback={<PageLoader />}>
               <FieldInspection />
             </Suspense>
           } />
+          <Route path="certificates" element={
+            <Suspense fallback={<PageLoader />}>
+              <PlaceholderPage title="Certificates" description="Browse all issued verification certificates." />
+            </Suspense>
+          } />
           <Route path="certificates/:id" element={
             <Suspense fallback={<PageLoader />}>
               <CertificateView />
+            </Suspense>
+          } />
+          <Route path="logs" element={
+            <Suspense fallback={<PageLoader />}>
+              <PlaceholderPage title="Audit Logs" description="Review detailed system activity and audit logs." />
+            </Suspense>
+          } />
+          <Route path="settings" element={
+            <Suspense fallback={<PageLoader />}>
+              <PlaceholderPage title="Settings" description="Configure your system preferences." />
+            </Suspense>
+          } />
+          <Route path="help" element={
+            <Suspense fallback={<PageLoader />}>
+              <PlaceholderPage title="Help & Support" description="Access user manuals and contact support." />
             </Suspense>
           } />
           {/* Fallbacks */}
