@@ -98,4 +98,22 @@ export const submitInspectionFindings = async (appId: string, data: any) => {
   }
 }
 
+export const fetchCertificateDetails = async (id: string) => {
+  try {
+    const response = await api.get(`/certificates/${id}`);
+    return response.data;
+  } catch (error) {
+    console.warn("Failed to fetch certificate, using mock data", error);
+    return {
+      id: id || 'CERT-2023-994A',
+      instrument_name: 'Industrial Flow Meter Type-X',
+      serial_number: 'S/N: 994-A22-BX',
+      business_name: 'Acme Manufacturing Corp.',
+      issued_date: 'October 24, 2023',
+      valid_until: 'October 24, 2024',
+      inspector_name: 'J. Doe'
+    };
+  }
+}
+
 export default api;

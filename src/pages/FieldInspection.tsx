@@ -1,32 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { submitInspectionFindings } from '../api';
+import { submitInspectionFindings, fetchApplicationDetails } from '../api';
 
 export default function FieldInspection() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const [loadTest, setLoadTest] = useState('');
   const [eccentricity, setEccentricity] = useState('');
   const [isWithinTolerance, setIsWithinTolerance] = useState(true);
   const [notes, setNotes] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [appData, setAppData] = useState<any>(null);
+
+  useEffect(() => {
+    if (id) {
+      fetchApplicationDetails(id).then(setAppData).catch(console.error);
+    }
+  }, [id]);
 
   const handleSubmit = async () => {
     setLoading(true);
-    await submitInspectionFindings(id as string, {
-      loadTest,
-      eccentricity,
-      isWithinTolerance,
-      notes
-    });
-    setLoading(false);
-    navigate(`/applications/${id}`); // Redirect back to application details
+    try {
+      await submitInspectionFindings(id || '', {
+        loadTest, eccentricity, isWithinTolerance, notes
+      });
+      navigate(`/applications/${id}`);
+    } catch (e) {
+      console.error(e);
+      setLoading(false);
+    }
   };
 
+  const instrument = appData?.instruments?.[0]; // Assume first instrument for demo
+
   return (
-    <div className="max-w-4xl mx-auto w-full flex flex-col gap-6 pb-32">
-      <div className="flex items-center gap-4 mb-2 md:hidden">
-        <button className="p-2 neu-btn rounded-full text-on-surface flex items-center justify-center" onClick={() => navigate(-1)}>
+    <div className="max-w-4xl mx-auto space-y-6 w-full pt-4 pb-24">
+      {/* Top App Bar inside main area */}
+      <div className="flex items-center gap-4 mb-6 sticky top-16 bg-background/90 backdrop-blur-md z-10 py-2">
+        <button 
+          className="neu-btn w-10 h-10 flex items-center justify-center text-on-surface-variant rounded-full"
+          onClick={() => navigate(-1)}
+        >
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
         <div className="flex flex-col">
@@ -38,10 +52,12 @@ export default function FieldInspection() {
       <section className="neu-flat rounded-xl p-5 flex flex-col gap-4">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="font-headline-sm text-headline-sm text-primary font-bold mb-1">Weighing Scale X-400</h2>
+            <h2 className="font-headline-sm text-headline-sm text-primary font-bold mb-1">
+              {instrument?.name || 'Weighing Scale X-400'}
+            </h2>
             <p className="font-body-md text-body-md text-on-surface-variant flex items-center gap-1">
               <span className="material-symbols-outlined text-[16px]">business</span>
-              Apex Retail Markets
+              {appData?.business_name || 'Apex Retail Markets'}
             </p>
           </div>
           <div className="px-3 py-1 bg-tertiary-container/10 text-tertiary-container rounded-full font-label-sm text-label-sm font-bold neu-flat">
@@ -51,11 +67,11 @@ export default function FieldInspection() {
         <div className="grid grid-cols-2 gap-4 mt-2">
           <div className="flex flex-col">
             <span className="font-label-sm text-label-sm text-on-surface-variant">Serial No.</span>
-            <span className="font-label-lg text-label-lg font-code">SN-8839-KL</span>
+            <span className="font-label-lg text-label-lg font-code">{instrument?.serial || 'SN-8839-KL'}</span>
           </div>
           <div className="flex flex-col">
-            <span className="font-label-sm text-label-sm text-on-surface-variant">Capacity</span>
-            <span className="font-label-lg text-label-lg">30.00 kg</span>
+            <span className="font-label-sm text-label-sm text-on-surface-variant">Class / Type</span>
+            <span className="font-label-lg text-label-lg">{instrument?.class || 'Class III'} / {instrument?.type || 'Routine'}</span>
           </div>
         </div>
       </section>

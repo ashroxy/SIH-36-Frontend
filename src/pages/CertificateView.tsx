@@ -1,18 +1,34 @@
-
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { fetchCertificateDetails } from '../api';
 
 export default function CertificateView() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [certData, setCertData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (id) {
+      fetchCertificateDetails(id).then(data => {
+        setCertData(data);
+        setLoading(false);
+      });
+    }
+  }, [id]);
+
+  if (loading) {
+    return <div className="p-8 flex items-center justify-center">Loading certificate...</div>;
+  }
 
   return (
-    <div className="w-full flex-1 flex flex-col items-center">
+    <div className="w-full flex-1 flex flex-col items-center pb-24">
       {/* Breadcrumbs & Header */}
-      <div className="w-full max-w-4xl mb-8 flex justify-between items-end">
+      <div className="w-full max-w-4xl mb-8 flex justify-between items-end mt-4">
         <div>
           <nav className="flex text-sm text-on-surface-variant mb-2">
             <ol className="flex items-center space-x-2">
-              <li><button onClick={() => navigate(-1)} className="hover:text-primary transition-colors">Certificates</button></li>
+              <li><button onClick={() => navigate(-1)} className="hover:text-primary transition-colors">Back</button></li>
               <li><span className="material-symbols-outlined text-sm">chevron_right</span></li>
               <li className="text-primary font-medium">View Certificate</li>
             </ol>
@@ -20,10 +36,10 @@ export default function CertificateView() {
           <h2 className="font-headline-lg text-headline-lg text-on-surface">Digital Verification Certificate</h2>
         </div>
         <div className="flex gap-4">
-          <button className="neu-btn px-6 py-3 rounded-full flex items-center gap-2 text-primary font-label-lg text-label-lg">
+          <button className="neu-btn px-6 py-3 rounded-full flex items-center gap-2 text-primary font-label-lg text-label-lg hover:bg-primary/5 transition-colors">
             <span className="material-symbols-outlined">print</span> Print
           </button>
-          <button className="neu-btn px-6 py-3 rounded-full flex items-center gap-2 bg-primary/5 text-primary font-label-lg text-label-lg">
+          <button className="neu-btn px-6 py-3 rounded-full flex items-center gap-2 bg-primary/5 text-primary font-label-lg text-label-lg hover:bg-primary/10 transition-colors">
             <span className="material-symbols-outlined">download</span> Download PDF
           </button>
         </div>
@@ -49,26 +65,26 @@ export default function CertificateView() {
           <div className="flex-1 space-y-8">
             <div>
               <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Instrument Detail</p>
-              <p className="font-headline-md text-headline-md text-on-surface border-b-2 border-surface-dim pb-2 inline-block">Industrial Flow Meter Type-X</p>
+              <p className="font-headline-md text-headline-md text-on-surface border-b-2 border-surface-dim pb-2 inline-block">{certData?.instrument_name}</p>
             </div>
             <div className="grid grid-cols-2 gap-8">
               <div>
                 <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Serial Number</p>
-                <p className="font-body-lg text-body-lg text-on-surface font-code bg-surface-container-low px-3 py-1 rounded neu-recessed inline-block">S/N: 994-A22-BX</p>
+                <p className="font-body-lg text-body-lg text-on-surface font-code bg-surface-container-low px-3 py-1 rounded neu-recessed inline-block">{certData?.serial_number}</p>
               </div>
               <div>
                 <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Owner / Business</p>
-                <p className="font-body-lg text-body-lg text-on-surface font-medium">Acme Manufacturing Corp.</p>
+                <p className="font-body-lg text-body-lg text-on-surface font-medium">{certData?.business_name}</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-8">
               <div>
                 <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Issued Date</p>
-                <p className="font-body-lg text-body-lg text-on-surface">October 24, 2023</p>
+                <p className="font-body-lg text-body-lg text-on-surface">{certData?.issued_date}</p>
               </div>
               <div>
                 <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-1">Valid Until</p>
-                <p className="font-body-lg text-body-lg text-primary font-bold">October 24, 2024</p>
+                <p className="font-body-lg text-body-lg text-primary font-bold">{certData?.valid_until}</p>
               </div>
             </div>
           </div>
@@ -80,7 +96,7 @@ export default function CertificateView() {
                 {/* Placeholder for QR Code */}
                 <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 font-code">QR CODE</div>
               </div>
-              <p className="text-center mt-2 font-code text-label-sm text-on-surface-variant">ID: CERT-{id || '2023-994A'}</p>
+              <p className="text-center mt-2 font-code text-label-sm text-on-surface-variant">ID: {certData?.id}</p>
             </div>
           </div>
         </div>
@@ -90,7 +106,7 @@ export default function CertificateView() {
           <div className="w-1/3">
             <p className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-4">Authorized Signature</p>
             <div className="border-b-2 border-on-surface-variant/50 w-full h-12 flex items-end justify-center pb-2">
-              <span className="font-headline-sm text-headline-sm italic text-primary/80" style={{ fontFamily: "'Times New Roman', serif" }}>J. Doe</span>
+              <span className="font-headline-sm text-headline-sm italic text-primary/80" style={{ fontFamily: "'Times New Roman', serif" }}>{certData?.inspector_name}</span>
             </div>
             <p className="text-center font-label-sm text-label-sm text-on-surface-variant mt-2">Chief Inspector, Metrology</p>
           </div>
