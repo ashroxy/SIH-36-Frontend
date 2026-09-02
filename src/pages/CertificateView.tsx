@@ -80,7 +80,7 @@ export default function CertificateView() {
                 {/* Placeholder for QR Code */}
                 <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 font-code">QR CODE</div>
               </div>
-              <p className="text-center mt-2 font-code text-label-sm text-on-surface-variant">ID: CERT-2023-994A</p>
+              <p className="text-center mt-2 font-code text-label-sm text-on-surface-variant">ID: CERT-{id || '2023-994A'}</p>
             </div>
           </div>
         </div>

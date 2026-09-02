@@ -1,15 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { submitInspectionFindings } from '../api';
 
 export default function FieldInspection() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [loadTest, setLoadTest] = useState('');
+  const [eccentricity, setEccentricity] = useState('');
+  const [isWithinTolerance, setIsWithinTolerance] = useState(true);
+  const [notes, setNotes] = useState('');
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    await submitInspectionFindings(id as string, {
+      loadTest,
+      eccentricity,
+      isWithinTolerance,
+      notes
+    });
+    setLoading(false);
+    navigate(`/applications/${id}`); // Redirect back to application details
+  };
 
   return (
     <div className="max-w-4xl mx-auto w-full flex flex-col gap-6 pb-32">
-      {/* Header handled by Layout usually, but let's add a specific one for mobile feel here if needed, or just let Layout handle it */}
       <div className="flex items-center gap-4 mb-2 md:hidden">
-        <button className="p-2 neu-btn rounded-full text-on-surface" onClick={() => navigate(-1)}>
+        <button className="p-2 neu-btn rounded-full text-on-surface flex items-center justify-center" onClick={() => navigate(-1)}>
           <span className="material-symbols-outlined">arrow_back</span>
         </button>
         <div className="flex flex-col">
@@ -50,14 +67,26 @@ export default function FieldInspection() {
           <div className="flex flex-col gap-2">
             <label className="font-label-lg text-label-lg text-on-surface pl-1">Load Test (10kg)</label>
             <div className="neu-input-container rounded-lg flex items-center px-4 h-12">
-              <input className="neu-input w-full text-on-surface font-body-md placeholder-outline h-full" placeholder="Enter reading" type="number" />
+              <input 
+                className="neu-input w-full text-on-surface font-body-md placeholder-outline h-full border-none focus:ring-0 outline-none" 
+                placeholder="Enter reading" 
+                type="number" 
+                value={loadTest}
+                onChange={(e) => setLoadTest(e.target.value)}
+              />
               <span className="font-label-sm text-label-sm text-on-surface-variant ml-2">kg</span>
             </div>
           </div>
           <div className="flex flex-col gap-2">
             <label className="font-label-lg text-label-lg text-on-surface pl-1">Eccentricity Test</label>
             <div className="neu-input-container rounded-lg flex items-center px-4 h-12">
-              <input className="neu-input w-full text-on-surface font-body-md placeholder-outline h-full" placeholder="Max deviation" type="number" />
+              <input 
+                className="neu-input w-full text-on-surface font-body-md placeholder-outline h-full border-none focus:ring-0 outline-none" 
+                placeholder="Max deviation" 
+                type="number" 
+                value={eccentricity}
+                onChange={(e) => setEccentricity(e.target.value)}
+              />
               <span className="font-label-sm text-label-sm text-on-surface-variant ml-2">g</span>
             </div>
           </div>
@@ -67,7 +96,12 @@ export default function FieldInspection() {
               <span className="font-label-sm text-label-sm text-on-surface-variant">± 0.05% margin</span>
             </div>
             <label className="relative inline-flex items-center cursor-pointer group">
-              <input defaultChecked className="sr-only peer" type="checkbox" />
+              <input 
+                checked={isWithinTolerance} 
+                onChange={() => setIsWithinTolerance(!isWithinTolerance)}
+                className="sr-only peer" 
+                type="checkbox" 
+              />
               <div className="w-14 h-8 bg-surface-container rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-primary after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all neu-recessed peer-checked:bg-primary-container/20"></div>
             </label>
           </div>
@@ -107,20 +141,29 @@ export default function FieldInspection() {
         <div className="neu-flat rounded-xl p-5 flex flex-col gap-2">
           <label className="font-label-lg text-label-lg text-on-surface pl-1">Inspector Notes</label>
           <div className="neu-input-container rounded-lg p-1">
-            <textarea className="neu-input w-full text-on-surface font-body-md placeholder-outline resize-none p-3 h-24" placeholder="Add optional remarks..." />
+            <textarea 
+              className="neu-input w-full text-on-surface font-body-md placeholder-outline resize-none p-3 h-24 border-none outline-none focus:ring-0" 
+              placeholder="Add optional remarks..." 
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+            />
           </div>
         </div>
       </section>
 
       {/* Action Bar */}
-      <div className="fixed bottom-0 left-0 md:left-64 right-0 bg-background/80 backdrop-blur-md p-4 shadow-[0_-4px_10px_#dce1eb] z-10 border-t border-surface-dim">
+      <div className="fixed bottom-0 left-0 md:left-64 right-0 bg-background/80 backdrop-blur-md p-4 shadow-[0_-4px_10px_rgba(220,225,235,0.5)] z-10 border-t border-surface-dim">
         <div className="max-w-4xl mx-auto flex gap-4">
           <button className="flex-1 py-4 neu-btn rounded-xl font-label-lg text-label-lg text-on-surface font-bold">
             Save Draft
           </button>
-          <button className="flex-[2] py-4 rounded-xl font-label-lg text-label-lg text-primary font-bold neu-flat transition-all active:scale-95 flex items-center justify-center gap-2">
+          <button 
+            onClick={handleSubmit}
+            disabled={loading}
+            className="flex-[2] py-4 rounded-xl font-label-lg text-label-lg text-primary font-bold neu-flat transition-all active:scale-95 flex items-center justify-center gap-2 hover:bg-primary-fixed/20 disabled:opacity-70 disabled:cursor-not-allowed"
+          >
             <span className="material-symbols-outlined">check_circle</span>
-            Submit Findings
+            {loading ? 'Submitting...' : 'Submit Findings'}
           </button>
         </div>
       </div>

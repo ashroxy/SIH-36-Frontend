@@ -1,9 +1,39 @@
-import React from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { fetchApplicationDetails } from '../api';
 
 export default function ApplicationDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [appData, setAppData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (id) {
+      fetchApplicationDetails(id).then(data => {
+        setAppData(data);
+        setLoading(false);
+      });
+    }
+  }, [id]);
+
+  if (loading) {
+    return <div className="p-8 flex items-center justify-center">Loading application details...</div>;
+  }
+
+  const statusList = [
+    { label: 'Draft', status: 'DRAFT', icon: 'edit_document' },
+    { label: 'Submitted', status: 'SUBMITTED', icon: 'send' },
+    { label: 'Approved', status: 'APPROVED', icon: 'thumb_up' },
+    { label: 'Scheduled', status: 'SCHEDULED', icon: 'calendar_today' },
+    { label: 'Assigned', status: 'ASSIGNED_LMO', icon: 'person_outline' },
+    { label: 'Inspection', status: 'INSPECTION_IN_PROGRESS', icon: 'assignment' },
+    { label: 'Issued', status: 'CERTIFICATE_ISSUED', icon: 'verified' }
+  ];
+
+  const currentStatusIndex = statusList.findIndex(s => s.status === appData?.status) || 0;
+  // Fallback for mocked 'SCHEDULED' -> index 3
+  const activeIndex = appData?.status === 'SCHEDULED' ? 3 : Math.max(0, currentStatusIndex);
 
   return (
     <div className="max-w-7xl mx-auto w-full flex-1 flex flex-col gap-stack-gap relative">
@@ -11,16 +41,16 @@ export default function ApplicationDetails() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
         <div>
           <h2 className="font-headline-lg text-headline-lg text-on-surface flex items-center gap-3">
-            <button className="neu-btn p-2 text-on-surface-variant inline-flex" onClick={() => navigate(-1)}>
+            <button className="neu-btn p-2 text-on-surface-variant inline-flex rounded-full" onClick={() => navigate(-1)}>
               <span className="material-symbols-outlined">arrow_back</span>
             </button>
-            {id || 'APP-2023-8942'}
+            {appData?.id}
           </h2>
-          <p className="font-body-md text-body-md text-on-surface-variant mt-1 ml-14">Weighing Scale Verification - Fresh Foods Market</p>
+          <p className="font-body-md text-body-md text-on-surface-variant mt-1 ml-14">{appData?.type} - {appData?.business_name}</p>
         </div>
         <div className="flex gap-3">
           <span className="px-4 py-1.5 rounded-full neu-extruded font-label-sm text-label-sm text-primary flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-primary"></span> Inspection Scheduled
+            <span className="w-2 h-2 rounded-full bg-primary"></span> {appData?.status}
           </span>
         </div>
       </div>
@@ -30,32 +60,37 @@ export default function ApplicationDetails() {
         <h3 className="font-headline-sm text-headline-sm text-on-surface mb-6">Workflow Status</h3>
         <div className="min-w-[800px] flex items-center justify-between relative px-4 py-4">
           <div className="absolute top-1/2 left-8 right-8 h-1 -translate-y-1/2 neu-recessed z-0"></div>
-          <div className="absolute top-1/2 left-8 w-[60%] h-1 -translate-y-1/2 bg-primary z-0 rounded-full"></div>
+          <div 
+            className="absolute top-1/2 left-8 h-1 -translate-y-1/2 bg-primary z-0 rounded-full transition-all duration-500"
+            style={{ width: `${(activeIndex / (statusList.length - 1)) * 100}%` }}
+          ></div>
           
-          <Step active completed label="Draft" icon="check" />
-          <Step active completed label="Submitted" icon="check" />
-          <Step active completed label="Approved" icon="check" />
-          <Step active={true} completed={false} label="Scheduled" icon="calendar_today" />
-          <Step active={false} completed={false} label="Assigned" icon="person_outline" />
-          <Step active={false} completed={false} label="Inspection" icon="assignment" />
-          <Step active={false} completed={false} label="Issued" icon="verified" />
+          {statusList.map((step, index) => (
+            <Step 
+              key={step.status}
+              active={index === activeIndex} 
+              completed={index < activeIndex} 
+              label={step.label} 
+              icon={step.icon} 
+            />
+          ))}
         </div>
       </section>
 
       {/* Details Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-stack-gap">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-stack-gap mb-20">
         <section className="neu-flat p-padding-card lg:col-span-1 h-full">
           <h3 className="font-headline-sm text-headline-sm text-on-surface mb-6 flex items-center gap-2">
             <span className="material-symbols-outlined text-primary">storefront</span> Business Info
           </h3>
           <div className="flex flex-col gap-4">
-            <InfoItem label="Business Name" value="Fresh Foods Market Ltd." />
-            <InfoItem label="Registration Number" value="BRN-9023-A" isCode />
-            <InfoItem label="Location" value="124 Valley Road, West Wing, CBD" />
+            <InfoItem label="Business Name" value={appData?.business_name} />
+            <InfoItem label="Registration Number" value={appData?.registration_number} isCode />
+            <InfoItem label="Location" value={appData?.location} />
             <div className="neu-recessed p-4 flex flex-col gap-1">
               <span className="font-label-sm text-label-sm text-outline">Contact Person</span>
-              <span className="font-body-md text-body-md text-on-surface">Jane Doe (Manager)</span>
-              <span className="font-body-md text-body-md text-primary">+1 (555) 019-2834</span>
+              <span className="font-body-md text-body-md text-on-surface">{appData?.contact_person}</span>
+              <span className="font-body-md text-body-md text-primary">{appData?.contact_phone}</span>
             </div>
           </div>
         </section>
@@ -65,23 +100,22 @@ export default function ApplicationDetails() {
             <h3 className="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
               <span className="material-symbols-outlined text-primary">scale</span> Instruments for Verification
             </h3>
-            <span className="neu-recessed px-3 py-1 font-label-sm text-label-sm text-on-surface-variant">3 Items</span>
+            <span className="neu-recessed px-3 py-1 font-label-sm text-label-sm text-on-surface-variant">{appData?.instruments.length} Items</span>
           </div>
           <div className="flex flex-col gap-4 flex-1">
-            <InstrumentItem name="Deli Counter Scale - 30kg" serial="SN-492-MK2" icon="kitchen" type="Requires Recalibration" typeClass="bg-primary-container text-on-primary-container" />
-            <InstrumentItem name="Checkout Scale A - 15kg" serial="CHK-001" icon="conveyor_belt" type="Routine" />
-            <InstrumentItem name="Checkout Scale B - 15kg" serial="CHK-002" icon="conveyor_belt" type="Routine" />
+            {appData?.instruments.map((inst: any, idx: number) => (
+              <InstrumentItem 
+                key={idx}
+                name={inst.name} 
+                serial={inst.serial} 
+                icon={inst.icon} 
+                type={inst.type} 
+                typeClass={inst.type === 'Requires Recalibration' ? 'bg-primary-container text-on-primary-container' : undefined} 
+              />
+            ))}
           </div>
         </section>
       </div>
-
-      <section className="neu-recessed p-padding-card w-full flex flex-col items-center justify-center py-12 text-center opacity-80 mb-20">
-        <div className="w-16 h-16 rounded-full neu-flat flex items-center justify-center text-outline mb-4">
-          <span className="material-symbols-outlined text-3xl">fact_check</span>
-        </div>
-        <h3 className="font-headline-sm text-headline-sm text-on-surface mb-2">Inspection Pending</h3>
-        <p className="font-body-md text-body-md text-on-surface-variant max-w-md">Measurement results and reports will appear here once the scheduled verification process is completed by an assigned inspector.</p>
-      </section>
 
       {/* Action Bar */}
       <div className="fixed bottom-0 left-0 md:left-64 right-0 bg-background/80 backdrop-blur-md p-4 shadow-[0_-4px_10px_rgba(220,225,235,0.5)] flex justify-end gap-4 z-10 border-t border-surface-dim">
@@ -91,9 +125,9 @@ export default function ApplicationDetails() {
         <button className="neu-btn px-6 py-2.5 font-label-lg text-label-lg text-error flex items-center gap-2">
           <span className="material-symbols-outlined text-sm">cancel</span> Cancel App
         </button>
-        <button className="neu-btn px-8 py-2.5 font-label-lg text-label-lg flex items-center gap-2 ml-4 text-primary bg-primary/5">
-          <span className="material-symbols-outlined text-sm">event_note</span> Manage Schedule
-        </button>
+        <Link to={`/inspections/${id}`} className="neu-btn px-8 py-2.5 font-label-lg text-label-lg flex items-center gap-2 ml-4 text-primary bg-primary/5 hover:bg-primary/10 transition-colors rounded-lg">
+          <span className="material-symbols-outlined text-sm">assignment_turned_in</span> Begin Inspection
+        </Link>
       </div>
     </div>
   );
@@ -134,7 +168,7 @@ function Step({ active, completed, label, icon }: any) {
 
 function InfoItem({ label, value, isCode }: { label: string, value: string, isCode?: boolean }) {
   return (
-    <div className="neu-recessed p-4 flex flex-col gap-1">
+    <div className="neu-recessed p-4 flex flex-col gap-1 rounded-lg">
       <span className="font-label-sm text-label-sm text-outline">{label}</span>
       <span className={isCode ? "font-code text-code text-on-surface" : "font-body-md text-body-md text-on-surface font-medium"}>{value}</span>
     </div>
@@ -143,7 +177,7 @@ function InfoItem({ label, value, isCode }: { label: string, value: string, isCo
 
 function InstrumentItem({ name, serial, icon, type, typeClass }: any) {
   return (
-    <div className="neu-extruded p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+    <div className="neu-extruded p-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between rounded-lg">
       <div className="flex items-center gap-4">
         <div className="w-12 h-12 rounded-lg neu-recessed flex items-center justify-center text-primary">
           <span className="material-symbols-outlined">{icon}</span>

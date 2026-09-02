@@ -1,7 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { fetchDashboardMetrics, fetchApplications } from '../api';
 
 export default function Dashboard() {
+  const [metrics, setMetrics] = useState<any>(null);
+  const [applications, setApplications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([fetchDashboardMetrics(), fetchApplications()]).then(([m, apps]) => {
+      setMetrics(m);
+      setApplications(apps);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return <div className="p-8 flex items-center justify-center">Loading dashboard...</div>;
+  }
+
   return (
     <div className="max-w-7xl mx-auto w-full space-y-8">
       {/* Header Section */}
@@ -10,7 +27,7 @@ export default function Dashboard() {
           <h2 className="font-headline-lg text-headline-lg text-on-surface">Dashboard</h2>
           <p className="font-body-md text-body-md text-on-surface-variant mt-1">Overview of your business verification activities.</p>
         </div>
-        <button className="neu-btn bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label-lg text-label-lg flex items-center gap-2">
+        <button className="neu-btn bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label-lg text-label-lg flex items-center gap-2 hover:bg-primary/90">
           <span className="material-symbols-outlined">add_circle</span>
           New Application
         </button>
@@ -29,7 +46,7 @@ export default function Dashboard() {
             </span>
           </div>
           <p className="font-label-lg text-label-lg text-on-surface-variant mb-1">Registered Instruments</p>
-          <h3 className="font-headline-md text-headline-md text-on-surface">1,248</h3>
+          <h3 className="font-headline-md text-headline-md text-on-surface">{metrics?.registered_instruments}</h3>
         </div>
         
         {/* Metric 2 */}
@@ -43,7 +60,7 @@ export default function Dashboard() {
             </span>
           </div>
           <p className="font-label-lg text-label-lg text-on-surface-variant mb-1">Active Applications</p>
-          <h3 className="font-headline-md text-headline-md text-on-surface">34</h3>
+          <h3 className="font-headline-md text-headline-md text-on-surface">{metrics?.active_applications}</h3>
         </div>
         
         {/* Metric 3 */}
@@ -54,7 +71,7 @@ export default function Dashboard() {
             </div>
           </div>
           <p className="font-label-lg text-label-lg text-on-surface-variant mb-1">Valid Certificates</p>
-          <h3 className="font-headline-md text-headline-md text-on-surface">892</h3>
+          <h3 className="font-headline-md text-headline-md text-on-surface">{metrics?.valid_certificates}</h3>
         </div>
         
         {/* Metric 4 (Warning) */}
@@ -66,7 +83,7 @@ export default function Dashboard() {
             </div>
           </div>
           <p className="font-label-lg text-label-lg text-on-surface-variant mb-1 relative z-10">Expiring Soon</p>
-          <h3 className="font-headline-md text-headline-md text-tertiary relative z-10">12</h3>
+          <h3 className="font-headline-md text-headline-md text-tertiary relative z-10">{metrics?.expiring_soon}</h3>
         </div>
       </div>
 
@@ -87,85 +104,43 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody className="text-body-md text-on-surface">
-              {/* Row 1 */}
-              <tr className="border-b border-surface-container-highest/50 hover:bg-surface-container-low/50 transition-colors">
-                <td className="py-4 px-4 font-code text-primary">APP-2023-8901</td>
-                <td className="py-4 px-4">New Verification</td>
-                <td className="py-4 px-4">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-surface-variant/10 text-on-surface-variant border border-surface-variant/20">
-                    DRAFT
-                  </span>
-                </td>
-                <td className="py-4 px-4 text-right">
-                  <Link to="/applications/APP-2023-8901" className="neu-btn p-2 text-primary rounded-md inline-flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[18px]">edit</span>
-                  </Link>
-                </td>
-              </tr>
-              {/* Row 2 */}
-              <tr className="border-b border-surface-container-highest/50 hover:bg-surface-container-low/50 transition-colors">
-                <td className="py-4 px-4 font-code text-primary">APP-2023-8895</td>
-                <td className="py-4 px-4">Renewal</td>
-                <td className="py-4 px-4">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-primary-fixed/40 text-primary border border-primary/20">
-                    SUBMITTED
-                  </span>
-                </td>
-                <td className="py-4 px-4 text-right">
-                  <Link to="/applications/APP-2023-8895" className="neu-btn p-2 text-on-surface-variant rounded-md inline-flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[18px]">visibility</span>
-                  </Link>
-                </td>
-              </tr>
-              {/* Row 3 */}
-              <tr className="border-b border-surface-container-highest/50 hover:bg-surface-container-low/50 transition-colors">
-                <td className="py-4 px-4 font-code text-primary">APP-2023-8842</td>
-                <td className="py-4 px-4">New Verification</td>
-                <td className="py-4 px-4">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-tertiary-fixed/50 text-tertiary border border-tertiary/20">
-                    SCHEDULED
-                  </span>
-                </td>
-                <td className="py-4 px-4 text-right">
-                  <Link to="/applications/APP-2023-8842" className="neu-btn p-2 text-on-surface-variant rounded-md inline-flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[18px]">visibility</span>
-                  </Link>
-                </td>
-              </tr>
-              {/* Row 4 */}
-              <tr className="border-b border-surface-container-highest/50 hover:bg-surface-container-low/50 transition-colors">
-                <td className="py-4 px-4 font-code text-primary">APP-2023-8810</td>
-                <td className="py-4 px-4">Modification</td>
-                <td className="py-4 px-4">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-primary-container/20 text-on-primary-fixed border border-primary/20">
-                    IN_PROGRESS
-                  </span>
-                </td>
-                <td className="py-4 px-4 text-right">
-                  <Link to="/applications/APP-2023-8810" className="neu-btn p-2 text-on-surface-variant rounded-md inline-flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[18px]">visibility</span>
-                  </Link>
-                </td>
-              </tr>
-              {/* Row 5 */}
-              <tr className="hover:bg-surface-container-low/50 transition-colors">
-                <td className="py-4 px-4 font-code text-primary">APP-2023-8799</td>
-                <td className="py-4 px-4">Renewal</td>
-                <td className="py-4 px-4">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-green-100 text-green-800 border border-green-200">
-                    APPROVED
-                  </span>
-                </td>
-                <td className="py-4 px-4 text-right">
-                  <Link to="/applications/APP-2023-8799" className="neu-btn p-2 text-on-surface-variant rounded-md inline-flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[18px]">download</span>
-                  </Link>
-                </td>
-              </tr>
+              {applications.map((app) => (
+                <tr key={app.id} className="border-b border-surface-container-highest/50 hover:bg-surface-container-low/50 transition-colors">
+                  <td className="py-4 px-4 font-code text-primary">{app.id}</td>
+                  <td className="py-4 px-4">{app.type}</td>
+                  <td className="py-4 px-4">
+                    <StatusBadge status={app.status} />
+                  </td>
+                  <td className="py-4 px-4 text-right">
+                    <Link to={`/applications/${app.id}`} className="neu-btn p-2 text-on-surface-variant rounded-md inline-flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[18px]">
+                        {app.status === 'DRAFT' ? 'edit' : 'visibility'}
+                      </span>
+                    </Link>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
       </div>
     </div>
   );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  switch (status) {
+    case 'DRAFT':
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-surface-variant/10 text-on-surface-variant border border-surface-variant/20">DRAFT</span>;
+    case 'SUBMITTED':
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-primary-fixed/40 text-primary border border-primary/20">SUBMITTED</span>;
+    case 'SCHEDULED':
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-tertiary-fixed/50 text-tertiary border border-tertiary/20">SCHEDULED</span>;
+    case 'IN_PROGRESS':
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-primary-container/20 text-on-primary-fixed border border-primary/20">IN_PROGRESS</span>;
+    case 'APPROVED':
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-green-100 text-green-800 border border-green-200">APPROVED</span>;
+    default:
+      return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[12px] font-medium bg-gray-100 text-gray-800 border border-gray-200">{status}</span>;
+  }
 }
