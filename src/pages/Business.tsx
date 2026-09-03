@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { fetchBusinessProfile } from '../api';
+import { useToast } from '../components/ToastContext';
 
 export default function Business() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editForm, setEditForm] = useState<any>(null);
+  const { showToast } = useToast();
+
+  const [activeQuickAction, setActiveQuickAction] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBusinessProfile().then(data => {
@@ -51,9 +55,9 @@ export default function Business() {
           <div className="neu-flat rounded-2xl p-6">
              <h4 className="font-label-lg text-label-lg text-on-surface mb-4 border-b border-surface-dim pb-2">Quick Actions</h4>
              <ul className="flex flex-col gap-2">
-               <li><button onClick={() => alert("Add Branch flow initiated.")} className="w-full text-left neu-btn px-4 py-2 rounded-lg text-primary flex items-center gap-2 hover:bg-primary/5"><span className="material-symbols-outlined text-sm">add_circle</span> Add Branch</button></li>
-               <li><button onClick={() => alert("Add Representative flow initiated.")} className="w-full text-left neu-btn px-4 py-2 rounded-lg text-primary flex items-center gap-2 hover:bg-primary/5"><span className="material-symbols-outlined text-sm">group_add</span> Add Representative</button></li>
-               <li><button onClick={() => alert("Document upload dialog triggered.")} className="w-full text-left neu-btn px-4 py-2 rounded-lg text-primary flex items-center gap-2 hover:bg-primary/5"><span className="material-symbols-outlined text-sm">cloud_upload</span> Upload Documents</button></li>
+               <li><button onClick={() => setActiveQuickAction('branch')} className="w-full text-left neu-btn px-4 py-2 rounded-lg text-primary flex items-center gap-2 hover:bg-primary/5"><span className="material-symbols-outlined text-sm">add_circle</span> Add Branch</button></li>
+               <li><button onClick={() => setActiveQuickAction('rep')} className="w-full text-left neu-btn px-4 py-2 rounded-lg text-primary flex items-center gap-2 hover:bg-primary/5"><span className="material-symbols-outlined text-sm">group_add</span> Add Representative</button></li>
+               <li><button onClick={() => setActiveQuickAction('doc')} className="w-full text-left neu-btn px-4 py-2 rounded-lg text-primary flex items-center gap-2 hover:bg-primary/5"><span className="material-symbols-outlined text-sm">cloud_upload</span> Upload Documents</button></li>
              </ul>
           </div>
         </div>
@@ -106,7 +110,7 @@ export default function Business() {
       {/* Edit Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="neu-flat rounded-2xl w-full max-w-xl p-6 bg-background max-h-[90vh] overflow-y-auto">
+          <div className="neu-flat rounded-2xl w-full max-w-xl p-6 bg-background max-h-[90vh] overflow-y-auto animate-slide-up">
             <div className="flex justify-between items-center mb-6">
               <h2 className="font-headline-sm text-headline-sm text-on-surface">Edit Business Profile</h2>
               <button onClick={() => setIsEditModalOpen(false)} className="w-8 h-8 flex items-center justify-center text-on-surface-variant neu-btn rounded-full">
@@ -154,7 +158,53 @@ export default function Business() {
               </div>
               <div className="mt-4 flex justify-end gap-3">
                 <button onClick={() => setIsEditModalOpen(false)} className="px-6 py-2 neu-btn text-on-surface-variant font-label-lg rounded-lg">Cancel</button>
-                <button onClick={handleSave} className="px-6 py-2 neu-btn text-primary bg-primary/10 font-label-lg font-bold rounded-lg hover:bg-primary/20">Save Changes</button>
+                <button onClick={handleSave} className="px-6 py-2 neu-flat text-primary !bg-primary !text-on-primary font-label-lg font-bold rounded-lg shadow-[4px_4px_8px_#dce1eb,-4px_-4px_8px_#ffffff]">Save Changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Generic Quick Action Modal */}
+      {activeQuickAction && (
+        <div className="fixed inset-0 bg-black/40 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="neu-flat rounded-2xl w-full max-w-md p-6 bg-background animate-slide-up">
+            <h2 className="font-headline-sm text-headline-sm text-on-surface mb-4">
+              {activeQuickAction === 'branch' && 'Add Branch'}
+              {activeQuickAction === 'rep' && 'Add Representative'}
+              {activeQuickAction === 'doc' && 'Upload Documents'}
+            </h2>
+            <div className="flex flex-col gap-4">
+              {activeQuickAction === 'doc' ? (
+                <div className="border-2 border-dashed border-primary/30 rounded-xl p-8 text-center bg-primary/5 flex flex-col items-center justify-center cursor-pointer hover:bg-primary/10 transition-colors">
+                  <span className="material-symbols-outlined text-4xl text-primary mb-2">upload_file</span>
+                  <span className="font-label-md text-label-md text-on-surface">Click to browse or drag & drop</span>
+                  <span className="font-body-sm text-body-sm text-on-surface-variant mt-1">PDF, JPG, PNG (Max 5MB)</span>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-label-sm font-label-sm text-on-surface-variant mb-1">
+                    {activeQuickAction === 'branch' ? 'Branch Name' : 'Representative Name'}
+                  </label>
+                  <input 
+                    type="text" 
+                    placeholder="Enter name..."
+                    className="w-full neu-input-container rounded-lg px-4 py-2 text-body-md outline-none focus:ring-2 focus:ring-primary/20" 
+                  />
+                </div>
+              )}
+              
+              <div className="mt-4 flex justify-end gap-3">
+                <button onClick={() => setActiveQuickAction(null)} className="px-6 py-2 neu-btn text-on-surface-variant font-label-lg rounded-lg">Cancel</button>
+                <button 
+                  onClick={() => {
+                    showToast('Action completed successfully.', 'success');
+                    setActiveQuickAction(null);
+                  }} 
+                  className="px-6 py-2 neu-flat text-primary !bg-primary !text-on-primary font-label-lg font-bold rounded-lg shadow-[4px_4px_8px_#dce1eb,-4px_-4px_8px_#ffffff]"
+                >
+                  Confirm
+                </button>
               </div>
             </div>
           </div>

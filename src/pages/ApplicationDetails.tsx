@@ -1,12 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { fetchApplicationDetails } from '../api';
+import ConfirmModal from '../components/ConfirmModal';
+import { useToast } from '../components/ToastContext';
 
 export default function ApplicationDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [appData, setAppData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -122,13 +126,27 @@ export default function ApplicationDetails() {
         <button onClick={() => window.print()} className="neu-btn px-6 py-2.5 font-label-lg text-label-lg text-on-surface-variant flex items-center gap-2">
           <span className="material-symbols-outlined text-sm">print</span> Print Summary
         </button>
-        <button onClick={() => { if(window.confirm('Are you sure you want to cancel this application?')) { alert('Application Cancelled.'); navigate('/applications'); } }} className="neu-btn px-6 py-2.5 font-label-lg text-label-lg text-error flex items-center gap-2">
+        <button onClick={() => setIsCancelModalOpen(true)} className="neu-btn px-6 py-2.5 font-label-lg text-label-lg text-error flex items-center gap-2">
           <span className="material-symbols-outlined text-sm">cancel</span> Cancel App
         </button>
         <Link to={`/inspections/${id}`} className="neu-btn px-8 py-2.5 font-label-lg text-label-lg flex items-center gap-2 ml-4 text-primary bg-primary/5 hover:bg-primary/10 transition-colors rounded-lg">
           <span className="material-symbols-outlined text-sm">assignment_turned_in</span> Begin Inspection
         </Link>
       </div>
+
+      <ConfirmModal
+        isOpen={isCancelModalOpen}
+        title="Cancel Application"
+        message="Are you sure you want to cancel this application? This action cannot be undone."
+        confirmLabel="Yes, Cancel Application"
+        isDestructive={true}
+        onConfirm={() => {
+          showToast('Application Cancelled.', 'success');
+          setIsCancelModalOpen(false);
+          navigate('/applications');
+        }}
+        onCancel={() => setIsCancelModalOpen(false)}
+      />
     </div>
   );
 }

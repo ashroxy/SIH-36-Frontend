@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { fetchSettings } from '../api';
+import { useToast } from '../components/ToastContext';
 
 export default function Settings() {
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     fetchSettings().then(data => {
@@ -19,8 +20,7 @@ export default function Settings() {
     // Simulate API call
     setTimeout(() => {
       setIsSaving(false);
-      setToastMessage("Settings saved successfully!");
-      setTimeout(() => setToastMessage(null), 3000);
+      showToast("Settings saved successfully!", "success");
     }, 800);
   };
 
@@ -30,14 +30,6 @@ export default function Settings() {
 
   return (
     <div className="max-w-4xl mx-auto w-full flex flex-col gap-6 relative">
-      {/* Toast Notification */}
-      {toastMessage && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 bg-green-100 text-green-800 px-6 py-3 rounded-full shadow-lg z-50 flex items-center gap-2 font-label-lg transition-all animate-bounce">
-          <span className="material-symbols-outlined">check_circle</span>
-          {toastMessage}
-        </div>
-      )}
-
       <div className="mb-2">
         <h2 className="font-headline-lg text-headline-lg text-primary">Settings</h2>
         <p className="font-body-md text-body-md text-on-surface-variant mt-1">Manage your account and system preferences.</p>
@@ -90,7 +82,7 @@ export default function Settings() {
             </label>
           </div>
           <div className="mt-2">
-            <button onClick={() => { setToastMessage("Password change instructions sent to email."); setTimeout(() => setToastMessage(null), 3000); }} className="neu-btn px-6 py-2 text-primary font-label-lg rounded-lg">Change Password</button>
+            <button onClick={() => showToast("Password change instructions sent to email.", "info")} className="neu-btn px-6 py-2 text-primary font-label-lg rounded-lg">Change Password</button>
           </div>
         </div>
       </div>

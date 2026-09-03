@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { submitInspectionFindings, fetchApplicationDetails } from '../api';
+import { useToast } from '../components/ToastContext';
 
 export default function FieldInspection() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [loadTest, setLoadTest] = useState('');
   const [eccentricity, setEccentricity] = useState('');
   const [isWithinTolerance, setIsWithinTolerance] = useState(true);
@@ -172,7 +174,7 @@ export default function FieldInspection() {
       {/* Action Bar */}
       <div className="fixed bottom-0 left-0 md:left-64 right-0 bg-background/80 backdrop-blur-md p-4 shadow-[0_-4px_10px_rgba(220,225,235,0.5)] z-10 border-t border-surface-dim">
         <div className="max-w-4xl mx-auto flex gap-4">
-          <button onClick={() => { alert("Draft Saved Successfully!"); navigate(-1); }} className="flex-1 py-4 neu-btn rounded-xl font-label-lg text-label-lg text-on-surface font-bold">
+          <button onClick={() => { showToast("Draft Saved Successfully!", "success"); navigate(-1); }} className="flex-1 py-4 neu-btn rounded-xl font-label-lg text-label-lg text-on-surface font-bold">
             Save Draft
           </button>
           <button 

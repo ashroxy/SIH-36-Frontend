@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react';
 import { fetchInstruments } from '../api';
+import { useToast } from '../components/ToastContext';
 
 export default function Instruments() {
   const [instruments, setInstruments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [actionInstrumentId, setActionInstrumentId] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     fetchInstruments().then(data => {
@@ -14,10 +19,13 @@ export default function Instruments() {
     });
   }, []);
 
-  const filteredInstruments = instruments.filter(inst => 
-    inst.serial_number.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    inst.instrument_type.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredInstruments = instruments.filter(inst => {
+    const matchesSearch = inst.serial_number.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                          inst.instrument_type.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = categoryFilter ? inst.instrument_type === categoryFilter : true;
+    const matchesStatus = statusFilter ? inst.status === statusFilter : true;
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
 
   if (loading) {
     return <div className="p-8 flex items-center justify-center">Loading instruments...</div>;
@@ -53,15 +61,35 @@ export default function Instruments() {
           />
         </div>
         <div className="flex flex-wrap gap-3 w-full lg:w-auto items-center">
-          <button onClick={() => alert("Category filter options coming soon.")} className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
-            <span className="material-symbols-outlined text-[18px]">filter_list</span> Category
-          </button>
-          <button onClick={() => alert("Calibration date filter options coming soon.")} className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
-            <span className="material-symbols-outlined text-[18px]">event</span> Calibration Date
-          </button>
-          <button onClick={() => alert("Status filter options coming soon.")} className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
-            <span className="material-symbols-outlined text-[18px]">check_circle</span> Status
-          </button>
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant pointer-events-none">filter_list</span>
+            <select 
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="neu-btn appearance-none pl-10 pr-8 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg outline-none focus:ring-2 focus:ring-primary/20 bg-transparent"
+            >
+              <option value="">All Categories</option>
+              <option value="Weighing Scale">Weighing Scale</option>
+              <option value="Flow Meter">Flow Meter</option>
+              <option value="Thermometer">Thermometer</option>
+            </select>
+          </div>
+          
+          <div className="relative">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant pointer-events-none">check_circle</span>
+            <select 
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="neu-btn appearance-none pl-10 pr-8 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg outline-none focus:ring-2 focus:ring-primary/20 bg-transparent"
+            >
+              <option value="">All Statuses</option>
+              <option value="REGISTERED">Registered</option>
+              <option value="PENDING_VERIFICATION">Pending</option>
+              <option value="UNDER_VERIFICATION">Under Verification</option>
+              <option value="VERIFIED">Verified</option>
+              <option value="FAILED">Failed</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -94,7 +122,7 @@ export default function Instruments() {
                       <InstrumentStatus status={instrument.status} />
                     </td>
                     <td className="py-4 px-6 text-right">
-                      <button onClick={() => alert("Instrument actions: Edit, Delete, View History")} className="w-8 h-8 rounded-full neu-btn flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors ml-auto opacity-0 group-hover:opacity-100 focus:opacity-100">
+                      <button onClick={() => setActionInstrumentId(instrument.id)} className="w-8 h-8 rounded-full neu-btn flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors ml-auto opacity-0 group-hover:opacity-100 focus:opacity-100">
                         <span className="material-symbols-outlined text-[18px]">more_vert</span>
                       </button>
                     </td>
@@ -166,9 +194,61 @@ export default function Instruments() {
               </div>
               <div className="mt-4 flex justify-end gap-3">
                 <button onClick={() => setIsAddModalOpen(false)} className="px-6 py-2 neu-btn text-on-surface-variant font-label-lg rounded-lg">Cancel</button>
-                <button onClick={() => setIsAddModalOpen(false)} className="px-6 py-2 neu-btn text-primary bg-primary/10 font-label-lg font-bold rounded-lg">Add Instrument</button>
+                <button 
+                  onClick={() => {
+                    showToast('Instrument Added Successfully.', 'success');
+                    setIsAddModalOpen(false);
+                  }} 
+                  className="px-6 py-2 neu-flat text-primary !bg-primary !text-on-primary font-label-lg font-bold rounded-lg shadow-[4px_4px_8px_#dce1eb,-4px_-4px_8px_#ffffff]"
+                >
+                  Add Instrument
+                </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Action Modal */}
+      {actionInstrumentId && (
+        <div className="fixed inset-0 bg-black/40 z-[100] flex items-end sm:items-center justify-center sm:p-4 backdrop-blur-sm animate-slide-up sm:animate-none" onClick={() => setActionInstrumentId(null)}>
+          <div className="neu-flat rounded-t-2xl sm:rounded-2xl w-full sm:max-w-sm p-6 bg-background flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="font-headline-sm text-headline-sm text-on-surface">Instrument Actions</h3>
+              <button onClick={() => setActionInstrumentId(null)} className="w-8 h-8 flex items-center justify-center text-on-surface-variant neu-btn rounded-full">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            
+            <button 
+              onClick={() => {
+                showToast('Opening Edit Dialog...', 'info');
+                setActionInstrumentId(null);
+              }}
+              className="w-full text-left neu-btn px-4 py-3 rounded-lg text-on-surface flex items-center gap-3 hover:bg-surface-container-low"
+            >
+              <span className="material-symbols-outlined text-primary">edit</span> Edit Details
+            </button>
+            
+            <button 
+              onClick={() => {
+                showToast('Fetching history logs...', 'info');
+                setActionInstrumentId(null);
+              }}
+              className="w-full text-left neu-btn px-4 py-3 rounded-lg text-on-surface flex items-center gap-3 hover:bg-surface-container-low"
+            >
+              <span className="material-symbols-outlined text-primary">history</span> View History
+            </button>
+
+            <button 
+              onClick={() => {
+                showToast('Instrument deleted successfully.', 'error');
+                setActionInstrumentId(null);
+              }}
+              className="w-full text-left neu-btn px-4 py-3 rounded-lg text-error flex items-center gap-3 hover:bg-error-container/20 mt-2"
+            >
+              <span className="material-symbols-outlined">delete</span> Delete Instrument
+            </button>
           </div>
         </div>
       )}

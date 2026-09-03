@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { useToast } from './ToastContext';
 
 function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -12,6 +13,7 @@ export default function Layout() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const navigate = useNavigate();
+  const { showToast } = useToast();
   
   const profileRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -90,7 +92,12 @@ export default function Layout() {
             <div className="relative hidden sm:block">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
               <input 
-                onKeyDown={(e) => { if(e.key === 'Enter') alert('Global search results for: ' + e.currentTarget.value) }}
+                onKeyDown={(e) => { 
+                  if(e.key === 'Enter') {
+                    showToast('Searching for: ' + e.currentTarget.value, 'info');
+                    e.currentTarget.value = '';
+                  } 
+                }}
                 className="neu-input-container pl-10 pr-4 py-2 w-64 text-body-md font-body-md placeholder-on-surface-variant/70 text-on-surface bg-transparent rounded-full border-none outline-none focus:ring-0 focus:shadow-[inset_6px_6px_12px_#dce1eb,inset_-6px_-6px_12px_#ffffff]" 
                 placeholder="Search Metrology..." 
                 type="text" 
@@ -122,7 +129,7 @@ export default function Layout() {
                       <span className="font-body-md text-body-md text-on-surface-variant text-sm">Inspection INSP-2023-110 is tomorrow.</span>
                     </div>
                   </div>
-                  <button onClick={() => { alert('All notifications marked as read.'); setIsNotificationsOpen(false); }} className="text-primary font-label-sm text-center pt-2 border-t border-surface-dim hover:underline">Mark all as read</button>
+                  <button onClick={() => { showToast('All notifications marked as read.', 'success'); setIsNotificationsOpen(false); }} className="text-primary font-label-sm text-center pt-2 border-t border-surface-dim hover:underline">Mark all as read</button>
                 </div>
               )}
             </div>
@@ -156,7 +163,7 @@ export default function Layout() {
                     <span className="material-symbols-outlined text-[18px]">settings</span> Settings
                   </Link>
                   <div className="border-t border-surface-dim my-1"></div>
-                  <button onClick={() => { alert('Logged out successfully.'); navigate('/dashboard'); setIsProfileOpen(false); }} className="px-4 py-2 hover:bg-error-container/20 text-error font-label-sm flex items-center gap-2 w-full text-left">
+                  <button onClick={() => { showToast('Logged out successfully.', 'info'); navigate('/dashboard'); setIsProfileOpen(false); }} className="px-4 py-2 hover:bg-error-container/20 text-error font-label-sm flex items-center gap-2 w-full text-left">
                     <span className="material-symbols-outlined text-[18px]">logout</span> Log out
                   </button>
                 </div>

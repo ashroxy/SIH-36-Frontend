@@ -5,17 +5,22 @@ import { Link } from 'react-router-dom';
 export default function Applications() {
     const [applications, setApplications] = useState<any[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
+    const [typeFilter, setTypeFilter] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
     useEffect(() => {
         fetchApplications().then(setApplications).catch(console.error);
     }, []);
 
-    const filteredApplications = applications.filter(app => 
-      app.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      (app.type && app.type.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      app.status.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredApplications = applications.filter(app => {
+        const matchesSearch = app.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                              (app.type && app.type.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                              app.status.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesType = typeFilter ? (app.type || 'New Verification') === typeFilter : true;
+        const matchesStatus = statusFilter ? app.status === statusFilter : true;
+        return matchesSearch && matchesType && matchesStatus;
+    });
 
     return (
         <div className="max-w-7xl mx-auto space-y-8 w-full relative">
@@ -46,12 +51,33 @@ export default function Applications() {
                 />
               </div>
               <div className="flex flex-wrap gap-3 w-full lg:w-auto items-center">
-                <button onClick={() => alert("Type filter options coming soon.")} className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
-                  <span className="material-symbols-outlined text-[18px]">filter_list</span> Type
-                </button>
-                <button onClick={() => alert("Status filter options coming soon.")} className="neu-btn px-4 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg active:text-primary">
-                  <span className="material-symbols-outlined text-[18px]">check_circle</span> Status
-                </button>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant pointer-events-none">filter_list</span>
+                  <select 
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value)}
+                    className="neu-btn appearance-none pl-10 pr-8 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg outline-none focus:ring-2 focus:ring-primary/20 bg-transparent"
+                  >
+                    <option value="">All Types</option>
+                    <option value="New Verification">New Verification</option>
+                    <option value="Renewal">Renewal</option>
+                    <option value="Re-verification">Re-verification</option>
+                  </select>
+                </div>
+                <div className="relative">
+                  <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-on-surface-variant pointer-events-none">check_circle</span>
+                  <select 
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="neu-btn appearance-none pl-10 pr-8 py-2 flex items-center gap-2 text-on-surface-variant font-label-lg text-label-lg outline-none focus:ring-2 focus:ring-primary/20 bg-transparent"
+                  >
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Under Review">Under Review</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                  </select>
+                </div>
               </div>
             </div>
 
