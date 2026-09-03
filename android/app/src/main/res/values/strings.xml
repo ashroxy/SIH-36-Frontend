@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">LM Verify</string>
+    <string name="title_activity_main">LM Verify</string>
+    <string name="package_name">com.sih36.lmverify</string>
+    <string name="custom_url_scheme">com.sih36.lmverify</string>
+</resources>
