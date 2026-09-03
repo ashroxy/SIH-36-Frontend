@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
 import { useToast } from '../components/ToastContext';
+import { loginApi } from '../api';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -11,7 +12,7 @@ export default function Login() {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
       showToast('Please enter both email and password', 'error');
@@ -19,22 +20,26 @@ export default function Login() {
     }
 
     setIsLoading(true);
-    // Mock API call
-    setTimeout(() => {
+    try {
+      const response = await loginApi({ email, password });
+      
+      // We expect the backend to return { user: { id, name, email, role }, token: "jwt_token" }
+      login({
+        id: response.user?.id || 'USR-000',
+        name: response.user?.name || email.split('@')[0],
+        email: response.user?.email || email,
+        role: response.user?.role || 'BUSINESS',
+        token: response.token // Ensure the AuthContext stores this in localStorage
+      } as any);
+      
+      showToast('Successfully logged in!', 'success');
+      navigate('/dashboard');
+    } catch (error: any) {
+      const message = error.response?.data?.detail || 'Invalid credentials or network error.';
+      showToast(message, 'error');
+    } finally {
       setIsLoading(false);
-      if (email.includes('@')) {
-        login({
-          id: 'USR-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
-          name: email.split('@')[0],
-          email: email,
-          role: 'BUSINESS'
-        });
-        showToast('Successfully logged in!', 'success');
-        navigate('/dashboard');
-      } else {
-        showToast('Invalid credentials. Try any valid email.', 'error');
-      }
-    }, 1000);
+    }
   };
 
   return (

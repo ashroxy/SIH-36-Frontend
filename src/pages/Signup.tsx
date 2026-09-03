@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
 import { useToast } from '../components/ToastContext';
+import { signupApi } from '../api';
 
 export default function Signup() {
   const [name, setName] = useState('');
@@ -12,7 +13,7 @@ export default function Signup() {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !password) {
       showToast('Please fill all fields', 'error');
@@ -20,18 +21,26 @@ export default function Signup() {
     }
 
     setIsLoading(true);
-    // Mock API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const response = await signupApi({ name, email, password });
+      
+      // We expect the backend to return { user: { ... }, token: "jwt_token" } upon signup
       login({
-        id: 'USR-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
-        name: name,
-        email: email,
-        role: 'BUSINESS'
-      });
+        id: response.user?.id || 'USR-000',
+        name: response.user?.name || name,
+        email: response.user?.email || email,
+        role: response.user?.role || 'BUSINESS',
+        token: response.token
+      } as any);
+      
       showToast('Account created successfully!', 'success');
       navigate('/dashboard');
-    }, 1200);
+    } catch (error: any) {
+      const message = error.response?.data?.detail || 'Failed to create account. Please try again.';
+      showToast(message, 'error');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
