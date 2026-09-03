@@ -5,8 +5,8 @@ const config: CapacitorConfig = {
   appName: 'LM Verify',
   webDir: 'dist',
   server: {
-    // Allow mixed content for local dev
-    androidScheme: 'https',
+    // Allow HTTP traffic (cleartext) for connecting to local backend dev servers
+    cleartext: true,
   },
   plugins: {
     SplashScreen: {

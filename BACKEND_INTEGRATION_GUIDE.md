@@ -8,7 +8,16 @@ The frontend dynamically loads the API base URL from the environment variables.
 
 In the frontend repository, create a `.env` file at the root:
 ```env
+# For Web Development
 VITE_API_BASE_URL=http://localhost:8000/api/v1
+
+# ⚠️ CRITICAL FOR MOBILE (CAPACITOR) DEVELOPMENT ⚠️
+# The Android emulator cannot route `localhost` to your computer.
+# If building for Android emulator, you MUST use:
+# VITE_API_BASE_URL=http://10.0.2.2:8000/api/v1
+#
+# If deploying to a physical device on your WiFi, use your machine's local IP:
+# VITE_API_BASE_URL=http://192.168.1.xxx:8000/api/v1
 ```
 
 ## 2. Authentication (JWT)
