@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchDashboardMetrics, fetchApplications } from '../api';
+import EmptyState from '../components/EmptyState';
 
 export default function Dashboard() {
   const [metrics, setMetrics] = useState<any>(null);
@@ -93,36 +94,47 @@ export default function Dashboard() {
           <h3 className="font-headline-sm text-headline-sm text-on-surface">Recent Applications</h3>
           <Link to="/applications" className="text-primary font-label-lg text-label-lg hover:underline decoration-primary underline-offset-4">View All</Link>
         </div>
-        <div className="overflow-x-auto pb-4">
-          <table className="w-full text-left border-collapse min-w-[600px]">
-            <thead>
-              <tr className="text-on-surface-variant font-label-sm text-label-sm border-b border-surface-container-high">
-                <th className="pb-3 px-4 font-semibold uppercase tracking-wider">App ID</th>
-                <th className="pb-3 px-4 font-semibold uppercase tracking-wider">Type</th>
-                <th className="pb-3 px-4 font-semibold uppercase tracking-wider">Status</th>
-                <th className="pb-3 px-4 font-semibold uppercase tracking-wider text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="text-body-md text-on-surface">
-              {applications.map((app) => (
-                <tr key={app.id} className="border-b border-surface-container-highest/50 hover:bg-surface-container-low/50 transition-colors">
-                  <td className="py-4 px-4 font-code text-primary">{app.id}</td>
-                  <td className="py-4 px-4">{app.type}</td>
-                  <td className="py-4 px-4">
-                    <StatusBadge status={app.status} />
-                  </td>
-                  <td className="py-4 px-4 text-right">
-                    <Link to={`/applications/${app.id}`} className="neu-btn p-2 text-on-surface-variant rounded-md inline-flex items-center justify-center">
-                      <span className="material-symbols-outlined text-[18px]">
-                        {app.status === 'DRAFT' ? 'edit' : 'visibility'}
-                      </span>
-                    </Link>
-                  </td>
+        
+        {applications.length > 0 ? (
+          <div className="overflow-x-auto pb-4">
+            <table className="w-full text-left border-collapse min-w-[600px]">
+              <thead>
+                <tr className="text-on-surface-variant font-label-sm text-label-sm border-b border-surface-container-high">
+                  <th className="pb-3 px-4 font-semibold uppercase tracking-wider">App ID</th>
+                  <th className="pb-3 px-4 font-semibold uppercase tracking-wider">Type</th>
+                  <th className="pb-3 px-4 font-semibold uppercase tracking-wider">Status</th>
+                  <th className="pb-3 px-4 font-semibold uppercase tracking-wider text-right">Action</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="text-body-md text-on-surface">
+                {applications.map((app) => (
+                  <tr key={app.id} className="border-b border-surface-container-highest/50 hover:bg-surface-container-low/50 transition-colors">
+                    <td className="py-4 px-4 font-code text-primary">{app.id}</td>
+                    <td className="py-4 px-4">{app.type}</td>
+                    <td className="py-4 px-4">
+                      <StatusBadge status={app.status} />
+                    </td>
+                    <td className="py-4 px-4 text-right">
+                      <Link to={`/applications/${app.id}`} className="neu-btn p-2 text-on-surface-variant rounded-md inline-flex items-center justify-center">
+                        <span className="material-symbols-outlined text-[18px]">
+                          {app.status === 'DRAFT' ? 'edit' : 'visibility'}
+                        </span>
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <EmptyState 
+            icon="description" 
+            title="No recent applications" 
+            description="You haven't submitted any applications recently."
+            actionLabel="New Application"
+            actionTo="/applications"
+          />
+        )}
       </div>
     </div>
   );

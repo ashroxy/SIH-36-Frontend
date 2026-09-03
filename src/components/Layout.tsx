@@ -3,6 +3,7 @@ import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { useToast } from './ToastContext';
+import { useAuth } from './AuthContext';
 
 function cn(...inputs: (string | undefined | null | false)[]) {
   return twMerge(clsx(inputs));
@@ -14,6 +15,7 @@ export default function Layout() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { user, logout } = useAuth();
   
   const profileRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -145,16 +147,16 @@ export default function Layout() {
             <div className="relative" ref={profileRef}>
               <div 
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="w-10 h-10 rounded-full neu-flat overflow-hidden border-2 border-background cursor-pointer hover:scale-105 transition-transform flex items-center justify-center bg-primary-container text-on-primary-container font-bold"
+                className="w-10 h-10 rounded-full neu-flat overflow-hidden border-2 border-background cursor-pointer hover:scale-105 transition-transform flex items-center justify-center bg-primary-container text-on-primary-container font-bold uppercase"
               >
-                U
+                {user?.name?.charAt(0) || 'U'}
               </div>
               
               {isProfileOpen && (
                 <div className="absolute right-0 mt-3 w-48 neu-flat rounded-xl py-2 z-50 flex flex-col">
                   <div className="px-4 py-2 border-b border-surface-dim mb-1">
-                    <p className="font-label-sm text-label-sm font-bold text-on-surface">User Name</p>
-                    <p className="font-body-md text-[11px] text-on-surface-variant truncate">user@metrology.gov</p>
+                    <p className="font-label-sm text-label-sm font-bold text-on-surface truncate">{user?.name || 'User Name'}</p>
+                    <p className="font-body-md text-[11px] text-on-surface-variant truncate">{user?.email || 'user@email.com'}</p>
                   </div>
                   <Link to="/business" className="px-4 py-2 hover:bg-surface-container-low text-on-surface font-label-sm flex items-center gap-2" onClick={() => setIsProfileOpen(false)}>
                     <span className="material-symbols-outlined text-[18px]">business_center</span> My Business
@@ -163,7 +165,11 @@ export default function Layout() {
                     <span className="material-symbols-outlined text-[18px]">settings</span> Settings
                   </Link>
                   <div className="border-t border-surface-dim my-1"></div>
-                  <button onClick={() => { showToast('Logged out successfully.', 'info'); navigate('/dashboard'); setIsProfileOpen(false); }} className="px-4 py-2 hover:bg-error-container/20 text-error font-label-sm flex items-center gap-2 w-full text-left">
+                  <button onClick={() => { 
+                    logout();
+                    showToast('Logged out successfully.', 'info'); 
+                    setIsProfileOpen(false); 
+                  }} className="px-4 py-2 hover:bg-error-container/20 text-error font-label-sm flex items-center gap-2 w-full text-left">
                     <span className="material-symbols-outlined text-[18px]">logout</span> Log out
                   </button>
                 </div>

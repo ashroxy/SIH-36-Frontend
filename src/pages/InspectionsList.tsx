@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchInspections } from '../api';
+import EmptyState from '../components/EmptyState';
 
 export default function InspectionsList() {
   const [inspections, setInspections] = useState<any[]>([]);
@@ -40,22 +41,34 @@ export default function InspectionsList() {
               </tr>
             </thead>
             <tbody className="divide-y divide-surface-dim/30">
-              {inspections.map((insp) => (
-                <tr key={insp.id} className="hover:bg-surface-container-low/50 transition-colors group">
-                  <td className="py-4 px-6 font-code text-code text-on-surface font-medium">{insp.id}</td>
-                  <td className="py-4 px-6 font-body-md text-body-md text-on-surface">{insp.date}</td>
-                  <td className="py-4 px-6 font-body-md text-body-md text-on-surface">{insp.location}</td>
-                  <td className="py-4 px-6 font-body-md text-body-md text-on-surface">{insp.inspector}</td>
-                  <td className="py-4 px-6">
-                    <StatusBadge status={insp.status} />
-                  </td>
-                  <td className="py-4 px-6 text-right">
-                    <Link to={`/inspections/${insp.id}`} className="neu-btn px-4 py-2 text-primary font-label-sm font-bold rounded-lg hover:bg-primary/5 transition-colors">
-                      {insp.status === 'PENDING' ? 'Start' : 'View'}
-                    </Link>
+              {inspections.length > 0 ? (
+                inspections.map((insp) => (
+                  <tr key={insp.id} className="hover:bg-surface-container-low/50 transition-colors group">
+                    <td className="py-4 px-6 font-code text-code text-on-surface font-medium">{insp.id}</td>
+                    <td className="py-4 px-6 font-body-md text-body-md text-on-surface">{insp.date}</td>
+                    <td className="py-4 px-6 font-body-md text-body-md text-on-surface">{insp.location}</td>
+                    <td className="py-4 px-6 font-body-md text-body-md text-on-surface">{insp.inspector}</td>
+                    <td className="py-4 px-6">
+                      <StatusBadge status={insp.status} />
+                    </td>
+                    <td className="py-4 px-6 text-right">
+                      <Link to={`/inspections/${insp.id}`} className="neu-btn px-4 py-2 text-primary font-label-sm font-bold rounded-lg hover:bg-primary/5 transition-colors">
+                        {insp.status === 'PENDING' ? 'Start' : 'View'}
+                      </Link>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="p-0">
+                    <EmptyState 
+                      icon="event_busy" 
+                      title="No Inspections" 
+                      description="There are no physical inspections scheduled or completed."
+                    />
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

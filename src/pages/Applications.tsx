@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { fetchApplications } from '../api';
 import { Link } from 'react-router-dom';
+import EmptyState from '../components/EmptyState';
 
 export default function Applications() {
     const [applications, setApplications] = useState<any[]>([]);
@@ -111,9 +112,15 @@ export default function Applications() {
                                     </tr>
                                 ))
                             ) : (
-                                <tr>
-                                  <td colSpan={4} className="py-8 text-center text-on-surface-variant font-body-md">No applications match your search.</td>
-                                </tr>
+                                  <tr>
+                                    <td colSpan={4} className="p-0">
+                                      <EmptyState 
+                                        icon="search_off" 
+                                        title="No applications found" 
+                                        description="We couldn't find any applications matching your current filters."
+                                      />
+                                    </td>
+                                  </tr>
                             )}
                         </tbody>
                     </table>

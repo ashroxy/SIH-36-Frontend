@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fetchInstruments } from '../api';
 import { useToast } from '../components/ToastContext';
+import EmptyState from '../components/EmptyState';
 
 export default function Instruments() {
   const [instruments, setInstruments] = useState<any[]>([]);
@@ -130,7 +131,13 @@ export default function Instruments() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="py-8 text-center text-on-surface-variant font-body-md">No instruments match your search.</td>
+                  <td colSpan={6} className="p-0">
+                    <EmptyState 
+                      icon="search_off" 
+                      title="No instruments found" 
+                      description="Try adjusting your search query or filters."
+                    />
+                  </td>
                 </tr>
               )}
             </tbody>

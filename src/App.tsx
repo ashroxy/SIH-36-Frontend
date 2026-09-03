@@ -1,6 +1,8 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
+import type { ReactNode } from 'react';
 import Layout from './components/Layout';
+import { useAuth } from './components/AuthContext';
 
 // Lazy load the pages for better performance
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -15,6 +17,8 @@ const InspectionsList = lazy(() => import('./pages/InspectionsList'));
 const CertificatesList = lazy(() => import('./pages/CertificatesList'));
 const AuditLogs = lazy(() => import('./pages/AuditLogs'));
 const Help = lazy(() => import('./pages/Help'));
+const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -26,11 +30,33 @@ const PageLoader = () => (
   </div>
 );
 
+function ProtectedRoute({ children }: { children: ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path="/login" element={
+          <Suspense fallback={<PageLoader />}>
+            <Login />
+          </Suspense>
+        } />
+        <Route path="/signup" element={
+          <Suspense fallback={<PageLoader />}>
+            <Signup />
+          </Suspense>
+        } />
+        
+        <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={
             <Suspense fallback={<PageLoader />}>

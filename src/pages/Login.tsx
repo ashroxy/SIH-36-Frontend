@@ -1,0 +1,98 @@
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../components/AuthContext';
+import { useToast } from '../components/ToastContext';
+
+export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  const { showToast } = useToast();
+  const navigate = useNavigate();
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) {
+      showToast('Please enter both email and password', 'error');
+      return;
+    }
+
+    setIsLoading(true);
+    // Mock API call
+    setTimeout(() => {
+      setIsLoading(false);
+      if (email.includes('@')) {
+        login({
+          id: 'USR-' + Math.random().toString(36).substr(2, 6).toUpperCase(),
+          name: email.split('@')[0],
+          email: email,
+          role: 'BUSINESS'
+        });
+        showToast('Successfully logged in!', 'success');
+        navigate('/dashboard');
+      } else {
+        showToast('Invalid credentials. Try any valid email.', 'error');
+      }
+    }, 1000);
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex flex-col justify-center items-center p-4">
+      <div className="w-full max-w-md animate-slide-up">
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="material-symbols-outlined text-4xl">scale</span>
+          </div>
+          <h1 className="font-headline-lg text-headline-lg text-primary font-bold">LM Verify</h1>
+          <p className="font-body-md text-body-md text-on-surface-variant mt-2">Sign in to your account to continue</p>
+        </div>
+
+        <form onSubmit={handleLogin} className="neu-flat p-8 rounded-3xl flex flex-col gap-6">
+          <div className="flex flex-col gap-1.5">
+            <label className="font-label-sm text-label-sm text-on-surface-variant ml-1">Email Address</label>
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">mail</span>
+              <input 
+                type="email" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full neu-input-container pl-12 pr-4 py-3 rounded-xl font-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary/20 bg-transparent transition-all"
+                placeholder="owner@business.com"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label className="font-label-sm text-label-sm text-on-surface-variant ml-1 flex justify-between">
+              Password
+              <a href="#" onClick={(e) => { e.preventDefault(); showToast('Password reset link sent.', 'info'); }} className="text-primary hover:underline">Forgot?</a>
+            </label>
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">lock</span>
+              <input 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full neu-input-container pl-12 pr-4 py-3 rounded-xl font-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary/20 bg-transparent transition-all"
+                placeholder="••••••••"
+              />
+            </div>
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            className="w-full py-3 mt-4 neu-flat !bg-primary !text-on-primary font-label-lg font-bold rounded-xl flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-70 transition-all shadow-[4px_4px_8px_#dce1eb,-4px_-4px_8px_#ffffff]"
+          >
+            {isLoading ? <span className="material-symbols-outlined animate-spin">sync</span> : 'Sign In'}
+          </button>
+        </form>
+
+        <p className="text-center font-body-md text-body-md text-on-surface-variant mt-8">
+          Don't have an account? <Link to="/signup" className="text-primary font-bold hover:underline">Register here</Link>
+        </p>
+      </div>
+    </div>
+  );
+}
