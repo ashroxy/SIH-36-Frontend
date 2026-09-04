@@ -66,12 +66,24 @@ export default function Layout() {
 
         <nav className="flex-1 overflow-y-auto px-4 flex flex-col gap-2">
           <NavItem to="/dashboard" icon="dashboard" label="Dashboard" />
-          <NavItem to="/business" icon="business_center" label="My Business" />
+          
+          {/* Business Users only */}
+          {user?.role === 'BUSINESS' && (
+            <NavItem to="/business" icon="business_center" label="My Business" />
+          )}
+          
           <NavItem to="/instruments" icon="architecture" label="Instruments" />
           <NavItem to="/applications" icon="description" label="Applications" />
-          <NavItem to="/inspections" icon="assignment_turned_in" label="Inspections" />
+          
+          {/* Inspections accessible by everyone, but primarily for Inspectors */}
+          <NavItem to="/inspections" icon="assignment_turned_in" label={user?.role === 'INSPECTOR' ? "My Inspections" : "Inspections"} />
+          
           <NavItem to="/certificates" icon="verified" label="Certificates" />
-          <NavItem to="/logs" icon="history" label="Audit Logs" />
+          
+          {/* System Administrators only */}
+          {user?.role === 'ADMIN' && (
+            <NavItem to="/logs" icon="history" label="Audit Logs" />
+          )}
         </nav>
 
         <div className="px-4 mt-auto flex flex-col gap-2 border-t border-surface-dim pt-4 shadow-none">

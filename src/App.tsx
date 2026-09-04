@@ -30,15 +30,20 @@ const PageLoader = () => (
   </div>
 );
 
-function ProtectedRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useAuth();
+function ProtectedRoute({ children, allowedRoles }: { children: ReactNode, allowedRoles?: string[] }) {
+  const { isAuthenticated, user } = useAuth();
   const location = useLocation();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  return children;
+  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+    // If the user does not have permission, redirect to dashboard
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
 }
 
 function App() {
@@ -64,9 +69,11 @@ function App() {
             </Suspense>
           } />
           <Route path="business" element={
-            <Suspense fallback={<PageLoader />}>
-              <Business />
-            </Suspense>
+            <ProtectedRoute allowedRoles={['BUSINESS']}>
+              <Suspense fallback={<PageLoader />}>
+                <Business />
+              </Suspense>
+            </ProtectedRoute>
           } />
           <Route path="instruments" element={
             <Suspense fallback={<PageLoader />}>
@@ -104,9 +111,11 @@ function App() {
             </Suspense>
           } />
           <Route path="logs" element={
-            <Suspense fallback={<PageLoader />}>
-              <AuditLogs />
-            </Suspense>
+            <ProtectedRoute allowedRoles={['ADMIN']}>
+              <Suspense fallback={<PageLoader />}>
+                <AuditLogs />
+              </Suspense>
+            </ProtectedRoute>
           } />
           <Route path="settings" element={
             <Suspense fallback={<PageLoader />}>
